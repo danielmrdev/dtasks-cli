@@ -134,10 +134,16 @@ func TaskScheduleNext(db *sql.DB, id int64) (*models.Task, error) {
 // ProcessAutocompleteTasks marks overdue autocomplete tasks as done and spawns next occurrences.
 // Errors on individual tasks are logged to stderr but do not abort processing.
 func ProcessAutocompleteTasks(db *sql.DB) error {
-	today := time.Now().Format("2006-01-02")
+	now := time.Now()
+	today := now.Format("2006-01-02")
+	currentTime := now.Format("15:04")
 	rows, err := db.Query(
-		`SELECT id FROM tasks WHERE autocomplete = 1 AND completed = 0 AND due_date <= ?`,
-		today,
+		`SELECT id FROM tasks WHERE autocomplete = 1 AND completed = 0
+		 AND (
+		   due_date < ?
+		   OR (due_date = ? AND (due_time IS NULL OR due_time <= ?))
+		 )`,
+		today, today, currentTime,
 	)
 	if err != nil {
 		return fmt.Errorf("query autocomplete tasks: %w", err)

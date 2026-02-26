@@ -175,7 +175,7 @@ func TaskPatchFields(db *sql.DB, id int64, p TaskPatch) (*models.Task, error) {
 func TaskDone(db *sql.DB, id int64, done bool) error {
 	var err error
 	if done {
-		_, err = db.Exec(`UPDATE tasks SET completed = 1, completed_at = datetime('now') WHERE id = ?`, id)
+		_, err = db.Exec(`UPDATE tasks SET completed = 1, completed_at = datetime('now', 'localtime') WHERE id = ?`, id)
 	} else {
 		_, err = db.Exec(`UPDATE tasks SET completed = 0, completed_at = NULL WHERE id = ?`, id)
 	}

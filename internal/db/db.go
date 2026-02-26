@@ -51,7 +51,7 @@ func migrate(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS lists (
 		id         INTEGER PRIMARY KEY AUTOINCREMENT,
 		name       TEXT NOT NULL UNIQUE,
-		created_at DATETIME NOT NULL DEFAULT (datetime('now'))
+		created_at DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
 	);
 
 	CREATE TABLE IF NOT EXISTS tasks (
@@ -75,7 +75,7 @@ func migrate(db *sql.DB) error {
 		recur_ends_after   INTEGER,
 		recur_count        INTEGER NOT NULL DEFAULT 0,
 		autocomplete       INTEGER NOT NULL DEFAULT 0,
-		created_at         DATETIME NOT NULL DEFAULT (datetime('now'))
+		created_at         DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
 	);
 
 	CREATE INDEX IF NOT EXISTS idx_tasks_list    ON tasks(list_id);

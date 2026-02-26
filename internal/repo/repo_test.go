@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/danielmrdev/dtasks-cli/internal/db"
 	"github.com/danielmrdev/dtasks-cli/internal/repo"
@@ -714,5 +715,51 @@ func TestAutocomplete_NonAutocomplete(t *testing.T) {
 	got, _ := repo.TaskGet(d, task.ID)
 	if got.Completed {
 		t.Error("expected non-autocomplete task NOT to be completed")
+	}
+}
+
+func TestAutocomplete_DueTimeNotYetPassed(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	today := time.Now().Format("2006-01-02")
+	futureTime := time.Now().Add(2 * time.Hour).Format("15:04")
+	task, _ := repo.TaskCreate(d, repo.TaskInput{
+		ListID:       l.ID,
+		Title:        "Today but future time",
+		DueDate:      &today,
+		DueTime:      &futureTime,
+		Autocomplete: true,
+	})
+
+	if err := repo.ProcessAutocompleteTasks(d); err != nil {
+		t.Fatalf("ProcessAutocompleteTasks() error = %v", err)
+	}
+
+	got, _ := repo.TaskGet(d, task.ID)
+	if got.Completed {
+		t.Error("expected task NOT to be completed (due_time not yet passed)")
+	}
+}
+
+func TestAutocomplete_DueTimePassed(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	today := time.Now().Format("2006-01-02")
+	pastTime := time.Now().Add(-2 * time.Hour).Format("15:04")
+	task, _ := repo.TaskCreate(d, repo.TaskInput{
+		ListID:       l.ID,
+		Title:        "Today but past time",
+		DueDate:      &today,
+		DueTime:      &pastTime,
+		Autocomplete: true,
+	})
+
+	if err := repo.ProcessAutocompleteTasks(d); err != nil {
+		t.Fatalf("ProcessAutocompleteTasks() error = %v", err)
+	}
+
+	got, _ := repo.TaskGet(d, task.ID)
+	if !got.Completed {
+		t.Error("expected task to be completed (due_time already passed)")
 	}
 }
