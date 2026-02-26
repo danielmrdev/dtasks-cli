@@ -5,7 +5,7 @@ Thanks for taking the time to contribute.
 ## Getting started
 
 ```bash
-git clone https://github.com/danielmrdev/dtasks
+git clone https://github.com/danielmrdev/dtasks-cli
 cd dtasks
 go mod tidy
 go build ./...
@@ -14,7 +14,7 @@ go test ./...
 
 ## Workflow
 
-1. [Open an issue](https://github.com/danielmrdev/dtasks/issues) before starting non-trivial work so we can discuss the approach.
+1. [Open an issue](https://github.com/danielmrdev/dtasks-cli/issues) before starting non-trivial work so we can discuss the approach.
 2. Fork the repository and create a branch from `main`:
    ```bash
    git checkout -b fix/short-description
@@ -51,11 +51,11 @@ New packages under `internal/` are welcome for new features. Avoid adding depend
 
 ## Reporting bugs
 
-Use the [bug report template](https://github.com/danielmrdev/dtasks/issues/new?template=bug_report.yml). Include your platform, dtasks version (`dtasks --version`), and the exact command that failed.
+Use the [bug report template](https://github.com/danielmrdev/dtasks-cli/issues/new?template=bug_report.yml). Include your platform, dtasks version (`dtasks --version`), and the exact command that failed.
 
 ## Suggesting features
 
-Use the [feature request template](https://github.com/danielmrdev/dtasks/issues/new?template=feature_request.yml).
+Use the [feature request template](https://github.com/danielmrdev/dtasks-cli/issues/new?template=feature_request.yml).
 
 ## Versioning
 

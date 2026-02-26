@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/danielmrdev/dtasks/internal/config"
-	"github.com/danielmrdev/dtasks/internal/db"
-	"github.com/danielmrdev/dtasks/internal/output"
+	"github.com/danielmrdev/dtasks-cli/internal/config"
+	"github.com/danielmrdev/dtasks-cli/internal/db"
+	"github.com/danielmrdev/dtasks-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 

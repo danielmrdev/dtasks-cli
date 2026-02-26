@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 
-REPO="danielmrdev/dtasks"
+REPO="danielmrdev/dtasks-cli"
 BINARY="dtasks"
 
 # ── Detect OS ────────────────────────────────────────────────────────────────

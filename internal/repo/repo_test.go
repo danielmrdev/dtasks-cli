@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/danielmrdev/dtasks/internal/db"
-	"github.com/danielmrdev/dtasks/internal/repo"
+	"github.com/danielmrdev/dtasks-cli/internal/db"
+	"github.com/danielmrdev/dtasks-cli/internal/repo"
 )
 
 func openTestDB(t *testing.T) *sql.DB {

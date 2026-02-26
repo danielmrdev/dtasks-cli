@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/danielmrdev/dtasks/internal/output"
-	"github.com/danielmrdev/dtasks/internal/repo"
+	"github.com/danielmrdev/dtasks-cli/internal/output"
+	"github.com/danielmrdev/dtasks-cli/internal/repo"
 	"github.com/spf13/cobra"
 )
 

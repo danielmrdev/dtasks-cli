@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/danielmrdev/dtasks/internal/db"
+	"github.com/danielmrdev/dtasks-cli/internal/db"
 )
 
 func TestOpen(t *testing.T) {

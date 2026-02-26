@@ -4,8 +4,8 @@
   <img src="assets/dtasks-logo.png" alt="dtasks logo" width="200">
 </p>
 
-[![CI](https://github.com/danielmrdev/dtasks/actions/workflows/ci.yml/badge.svg)](https://github.com/danielmrdev/dtasks/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/danielmrdev/dtasks?sort=semver)](https://github.com/danielmrdev/dtasks/releases/latest)
+[![CI](https://github.com/danielmrdev/dtasks-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/danielmrdev/dtasks-cli/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/danielmrdev/dtasks-cli?sort=semver)](https://github.com/danielmrdev/dtasks-cli/releases/latest)
 [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)](https://go.dev)
 [![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)](#install)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -19,14 +19,14 @@ Tasks and lists live in a local SQLite database. Point the database path to a sh
 **macOS / Linux — install script**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/danielmrdev/dtasks/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/danielmrdev/dtasks-cli/main/install.sh | sh
 ```
 
 Detects your OS and architecture, downloads the correct binary, verifies the SHA-256 checksum, and installs to `/usr/local/bin` (or `~/.local/bin` if you don't have write access).
 
 **Manual download**
 
-Download the latest binary for your platform from the [Releases](https://github.com/danielmrdev/dtasks/releases/latest) page:
+Download the latest binary for your platform from the [Releases](https://github.com/danielmrdev/dtasks-cli/releases/latest) page:
 
 | Platform | File |
 |----------|------|
@@ -42,7 +42,7 @@ Each release includes a `checksums.txt` file with SHA-256 hashes.
 **Windows — install script (PowerShell)**
 
 ```powershell
-irm https://raw.githubusercontent.com/danielmrdev/dtasks/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/danielmrdev/dtasks-cli/main/install.ps1 | iex
 ```
 
 Installs to `%LOCALAPPDATA%\Programs\dtasks` and adds it to your user `PATH` automatically. No admin required.
@@ -54,7 +54,7 @@ Installs to `%LOCALAPPDATA%\Programs\dtasks` and adds it to your user `PATH` aut
 Requires Go 1.22+.
 
 ```bash
-git clone https://github.com/danielmrdev/dtasks
+git clone https://github.com/danielmrdev/dtasks-cli
 cd dtasks
 go mod tidy
 go build -o dtasks .

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/danielmrdev/dtasks/internal/models"
+	"github.com/danielmrdev/dtasks-cli/internal/models"
 )
 
 // --- Lists ---

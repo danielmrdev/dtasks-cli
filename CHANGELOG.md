@@ -28,5 +28,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions CI (vet + test + build on every push/PR)
 - GitHub Actions release workflow (triggered by `v*.*.*` tags, builds all 6 targets, publishes release with checksums)
 
-[Unreleased]: https://github.com/danielmrdev/dtasks/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/danielmrdev/dtasks/releases/tag/v0.1.0
+[Unreleased]: https://github.com/danielmrdev/dtasks-cli/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/danielmrdev/dtasks-cli/releases/tag/v0.1.0

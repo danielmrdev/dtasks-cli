@@ -4,7 +4,7 @@ param()
 
 $ErrorActionPreference = "Stop"
 
-$repo    = "danielmrdev/dtasks"
+$repo    = "danielmrdev/dtasks-cli"
 $binary  = "dtasks"
 $apiUrl  = "https://api.github.com/repos/$repo/releases/latest"
 
