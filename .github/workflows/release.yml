@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (e.g. v0.1.0)"
+        required: true
 
 permissions:
   contents: write
@@ -52,7 +57,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: "0"
         run: |
-          VERSION=${GITHUB_REF_NAME}
+          VERSION=${{ github.event.inputs.tag || github.ref_name }}
           go build \
             -ldflags="-s -w -X main.version=${VERSION}" \
             -o ${{ matrix.artifact }}${{ matrix.ext }} \
@@ -85,7 +90,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ github.ref_name }}" \
-            --title "${{ github.ref_name }}" \
+          TAG=${{ github.event.inputs.tag || github.ref_name }}
+          gh release create "${TAG}" \
+            --title "${TAG}" \
             --generate-notes \
             dist/*
