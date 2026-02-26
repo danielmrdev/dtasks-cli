@@ -92,24 +92,46 @@ func TestListGet(t *testing.T) {
 	}
 }
 
-func TestListRename(t *testing.T) {
+func TestListEdit(t *testing.T) {
 	d := openTestDB(t)
 
-	l, err := repo.ListCreate(d, "OldName", nil)
+	color := "#ff0000"
+	l, err := repo.ListCreate(d, "OldName", &color)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := repo.ListRename(d, l.ID, "NewName"); err != nil {
-		t.Fatalf("ListRename() error = %v", err)
-	}
-
-	got, err := repo.ListGet(d, l.ID)
+	// rename
+	newName := "NewName"
+	got, err := repo.ListPatchFields(d, l.ID, repo.ListPatch{Name: &newName})
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("ListPatchFields() error = %v", err)
 	}
 	if got.Name != "NewName" {
 		t.Errorf("expected Name=NewName, got %q", got.Name)
+	}
+	if got.Color == nil || *got.Color != "#ff0000" {
+		t.Errorf("expected Color unchanged, got %v", got.Color)
+	}
+
+	// change color
+	newColor := "#00ff00"
+	got, err = repo.ListPatchFields(d, l.ID, repo.ListPatch{Color: &newColor})
+	if err != nil {
+		t.Fatalf("ListPatchFields() error = %v", err)
+	}
+	if got.Color == nil || *got.Color != "#00ff00" {
+		t.Errorf("expected Color=#00ff00, got %v", got.Color)
+	}
+
+	// clear color
+	empty := ""
+	got, err = repo.ListPatchFields(d, l.ID, repo.ListPatch{Color: &empty})
+	if err != nil {
+		t.Fatalf("ListPatchFields() error = %v", err)
+	}
+	if got.Color != nil {
+		t.Errorf("expected Color=nil after clear, got %v", got.Color)
 	}
 }
 
@@ -134,10 +156,11 @@ func TestListDelete(t *testing.T) {
 	}
 }
 
-func TestListRename_NotFound(t *testing.T) {
+func TestListEdit_NotFound(t *testing.T) {
 	d := openTestDB(t)
 
-	if err := repo.ListRename(d, 9999, "ghost"); err == nil {
+	name := "ghost"
+	if _, err := repo.ListPatchFields(d, 9999, repo.ListPatch{Name: &name}); err == nil {
 		t.Error("expected error for non-existent list, got nil")
 	}
 }
