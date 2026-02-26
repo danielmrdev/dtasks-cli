@@ -4,21 +4,21 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/dtasks/dtasks/internal/output"
-	"github.com/dtasks/dtasks/internal/repo"
+	"github.com/danielmrdev/dtasks-cli/internal/output"
+	"github.com/danielmrdev/dtasks-cli/internal/repo"
 	"github.com/spf13/cobra"
 )
 
 // --- add ---
 
 var (
-	addListID   int64
-	addParent   int64
-	addNotes    string
-	addDate     string
-	addTime     string
-	addDueDate  string
-	addDueTime  string
+	addListID  int64
+	addParent  int64
+	addNotes   string
+	addDate    string
+	addTime    string
+	addDueDate string
+	addDueTime string
 )
 
 var addCmd = &cobra.Command{

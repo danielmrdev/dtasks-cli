@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/dtasks/dtasks/internal/models"
+	"github.com/danielmrdev/dtasks-cli/internal/models"
 )
 
 var JSONMode bool

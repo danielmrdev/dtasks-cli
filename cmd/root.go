@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dtasks/dtasks/internal/config"
-	"github.com/dtasks/dtasks/internal/db"
-	"github.com/dtasks/dtasks/internal/output"
+	"github.com/danielmrdev/dtasks-cli/internal/config"
+	"github.com/danielmrdev/dtasks-cli/internal/db"
+	"github.com/danielmrdev/dtasks-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 
 var (
-	DB      *sql.DB
-	jsonFlag bool
+	DB         *sql.DB
+	jsonFlag   bool
 	dbPathFlag string
 )
 
@@ -61,7 +61,8 @@ func init() {
 	rootCmd.AddCommand(recurCmd)
 }
 
-func Execute() {
+func Execute(version string) {
+	rootCmd.Version = version
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
