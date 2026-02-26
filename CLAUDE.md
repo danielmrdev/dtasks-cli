@@ -2,7 +2,7 @@
 
 ## What this is
 
-CLI task manager written in Go. Single static binary, no runtime dependencies. SQLite as the database. Designed to run on macOS and Linux (including Docker), sharing the same `.db` file via a volume or synced folder.
+CLI task manager written in Go. Single static binary, no runtime dependencies. SQLite as the database. Designed to run on macOS, Linux, and Windows (including Docker), sharing the same `.db` file via a volume or synced folder.
 
 ## Build and test
 
@@ -14,7 +14,7 @@ GOPROXY=https://goproxy.io,direct go mod tidy
 go build ./...
 
 # Build all targets
-make build-all          # darwin-arm64, linux-amd64, linux-arm64 → dist/
+make build-all          # macos-arm64, macos-amd64, linux-amd64, linux-arm64, windows-amd64.exe, windows-arm64.exe → dist/
 
 # Tests
 go test ./...
@@ -70,6 +70,9 @@ dtasks/
 |----------|--------|------------|
 | macOS | `~/.dtasks/.env` | `~/Library/Application Support/dtasks/tasks.db` |
 | Linux | `~/.config/dtasks/.env` (respects `$XDG_CONFIG_HOME`) | `~/.local/share/dtasks/tasks.db` (respects `$XDG_DATA_HOME`) |
+| Windows | `%AppData%\dtasks\.env` (`os.UserConfigDir()`) | `%LocalAppData%\dtasks\tasks.db` (`$LOCALAPPDATA`) |
+
+The Windows paths use `os.UserConfigDir()` for the config file and `%LOCALAPPDATA%` for the database (non-roaming, machine-local data).
 
 ## Existing tests
 

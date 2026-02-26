@@ -11,8 +11,15 @@ Download the latest binary for your platform from the [Releases](../../releases/
 | Platform | File |
 |----------|------|
 | macOS Apple Silicon | `dtasks-macos-arm64` |
+| macOS Intel | `dtasks-macos-amd64` |
 | Linux x86-64 | `dtasks-linux-amd64` |
 | Linux ARM64 | `dtasks-linux-arm64` |
+| Windows x86-64 | `dtasks-windows-amd64.exe` |
+| Windows ARM64 | `dtasks-windows-arm64.exe` |
+
+Each release includes a `checksums.txt` file with SHA-256 hashes.
+
+**macOS / Linux**
 
 ```bash
 # Example: Linux amd64
@@ -21,7 +28,7 @@ chmod +x dtasks
 sudo mv dtasks /usr/local/bin/
 ```
 
-Verify the download with the `checksums.txt` file included in each release.
+**Windows** — download the `.exe`, place it somewhere in your `PATH`, and run from PowerShell or Command Prompt.
 
 ## Build from source
 
@@ -34,7 +41,7 @@ go mod tidy
 go build -o dtasks .
 ```
 
-Or build all release targets at once:
+Build all release targets at once:
 
 ```bash
 make build-all   # outputs to dist/
@@ -44,8 +51,11 @@ make build-all   # outputs to dist/
 
 On first run, dtasks asks where to store the database and writes a config file:
 
-- **macOS:** `~/.dtasks/.env`
-- **Linux:** `~/.config/dtasks/.env`
+| Platform | Config file |
+|----------|-------------|
+| macOS | `~/.dtasks/.env` |
+| Linux | `~/.config/dtasks/.env` (respects `$XDG_CONFIG_HOME`) |
+| Windows | `%AppData%\dtasks\.env` |
 
 ```
 $ dtasks ls
@@ -56,7 +66,7 @@ Database path [~/.local/share/dtasks/tasks.db]:
 
 Press Enter to accept the default or type a custom path. The database is created automatically.
 
-To skip the wizard, set `DB_PATH` in the environment or pass `--db`:
+To skip the wizard, pass `--db` or set `DB_PATH` in the config file:
 
 ```bash
 dtasks --db /path/to/tasks.db ls

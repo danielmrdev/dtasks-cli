@@ -21,7 +21,10 @@ func EnvFilePath() string {
 	switch runtime.GOOS {
 	case "darwin":
 		return filepath.Join(home, ".dtasks", ".env")
-	default: // linux
+	case "windows":
+		configDir, _ := os.UserConfigDir() // %AppData%
+		return filepath.Join(configDir, "dtasks", ".env")
+	default: // linux / other unix
 		xdgConfig := os.Getenv("XDG_CONFIG_HOME")
 		if xdgConfig == "" {
 			xdgConfig = filepath.Join(home, ".config")
@@ -36,7 +39,13 @@ func DefaultDBPath() string {
 	switch runtime.GOOS {
 	case "darwin":
 		return filepath.Join(home, "Library", "Application Support", "dtasks", "tasks.db")
-	default: // linux
+	case "windows":
+		localAppData := os.Getenv("LOCALAPPDATA")
+		if localAppData == "" {
+			localAppData = filepath.Join(home, "AppData", "Local")
+		}
+		return filepath.Join(localAppData, "dtasks", "tasks.db")
+	default: // linux / other unix
 		xdgData := os.Getenv("XDG_DATA_HOME")
 		if xdgData == "" {
 			xdgData = filepath.Join(home, ".local", "share")

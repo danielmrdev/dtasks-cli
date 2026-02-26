@@ -19,12 +19,23 @@ jobs:
           - goos: darwin
             goarch: arm64
             artifact: dtasks-macos-arm64
+          - goos: darwin
+            goarch: amd64
+            artifact: dtasks-macos-amd64
           - goos: linux
             goarch: amd64
             artifact: dtasks-linux-amd64
           - goos: linux
             goarch: arm64
             artifact: dtasks-linux-arm64
+          - goos: windows
+            goarch: amd64
+            artifact: dtasks-windows-amd64
+            ext: .exe
+          - goos: windows
+            goarch: arm64
+            artifact: dtasks-windows-arm64
+            ext: .exe
 
     steps:
       - uses: actions/checkout@v4
@@ -44,13 +55,13 @@ jobs:
           VERSION=${GITHUB_REF_NAME}
           go build \
             -ldflags="-s -w -X main.version=${VERSION}" \
-            -o ${{ matrix.artifact }} \
+            -o ${{ matrix.artifact }}${{ matrix.ext }} \
             .
 
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}${{ matrix.ext }}
           retention-days: 1
 
   release:
