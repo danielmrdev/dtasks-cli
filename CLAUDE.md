@@ -2,7 +2,7 @@
 
 ## What this is
 
-CLI task manager written in Go. Single static binary, no runtime dependencies. SQLite as the database. Designed to run on macOS, Linux, and Windows (including Docker), sharing the same `.db` file via a volume or synced folder.
+CLI task manager written in Go. Single static binary, no runtime dependencies. SQLite as the database. Designed to run on macOS, Linux, and Windows. The database path can point to a synced folder (Dropbox, Google Drive, iCloud Drive, Syncthing…) to share tasks across machines.
 
 ## Build and test
 
