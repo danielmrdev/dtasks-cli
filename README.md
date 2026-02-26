@@ -1,12 +1,18 @@
 # dtasks
 
+[![CI](https://github.com/danielmrdev/dtasks/actions/workflows/ci.yml/badge.svg)](https://github.com/danielmrdev/dtasks/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/danielmrdev/dtasks?sort=semver)](https://github.com/danielmrdev/dtasks/releases/latest)
+[![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)](https://go.dev)
+[![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)](#install)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 A fast, scriptable CLI task manager. Single static binary — no runtime dependencies, no daemon, no sync service.
 
 Tasks and lists live in a local SQLite database. The same file can be shared between a macOS host and a Linux container via a volume mount, making it a good fit for Docker-based workflows.
 
 ## Install
 
-Download the latest binary for your platform from the [Releases](../../releases/latest) page:
+Download the latest binary for your platform from the [Releases](https://github.com/danielmrdev/dtasks/releases/latest) page:
 
 | Platform | File |
 |----------|------|
@@ -23,7 +29,7 @@ Each release includes a `checksums.txt` file with SHA-256 hashes.
 
 ```bash
 # Example: Linux amd64
-curl -Lo dtasks https://github.com/<owner>/dtasks/releases/latest/download/dtasks-linux-amd64
+curl -Lo dtasks https://github.com/danielmrdev/dtasks/releases/latest/download/dtasks-linux-amd64
 chmod +x dtasks
 sudo mv dtasks /usr/local/bin/
 ```
@@ -35,7 +41,7 @@ sudo mv dtasks /usr/local/bin/
 Requires Go 1.22+.
 
 ```bash
-git clone https://github.com/<owner>/dtasks
+git clone https://github.com/danielmrdev/dtasks
 cd dtasks
 go mod tidy
 go build -o dtasks .
