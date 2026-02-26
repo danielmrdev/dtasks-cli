@@ -6,81 +6,71 @@ LDFLAGS := -s -w -X main.version=$(VERSION)
 	build-mac-arm64 build-mac-amd64 \
 	build-linux-amd64 build-linux-arm64 \
 	build-windows-amd64 build-windows-arm64 \
-	release clean tidy run install
+	release clean tidy run install help
+
+help: ## Show available targets
+	@grep -E '^[a-zA-Z_-]+:.*##' Makefile | awk -F':.*## ' '{printf "  %-20s %s\n", $$1, $$2}'
 
 all: build-all
 
-## Install dependencies
-tidy:
+tidy: ## Install dependencies
 	go mod tidy
 
-## Build for the current platform (native)
-build:
+build: ## Build for the current platform (native)
 	CGO_ENABLED=0 go build -ldflags="$(LDFLAGS)" -o dist/$(BINARY) .
 	@echo "→ dist/$(BINARY)  ($(shell go env GOOS)/$(shell go env GOARCH))"
 
-## Tag and push to trigger the GitHub Actions release workflow.
-## Usage: make release TAG=v1.2.3
-release:
+release: ## Tag and push to trigger release workflow  (TAG=v1.2.3)
 	@[ -n "$(TAG)" ] || (echo "Usage: make release TAG=v1.2.3" && exit 1)
 	@echo "Tagging $(TAG)..."
 	git tag $(TAG)
 	git push origin $(TAG)
 	@echo "Release $(TAG) pushed — GitHub Actions will build and publish the binaries."
 
-## Build all targets
-build-all: build-mac-arm64 build-mac-amd64 build-linux-amd64 build-linux-arm64 build-windows-amd64 build-windows-arm64
+build-all: build-mac-arm64 build-mac-amd64 build-linux-amd64 build-linux-arm64 build-windows-amd64 build-windows-arm64 ## Build all targets
 
-## macOS Apple Silicon
-build-mac-arm64:
+build-mac-arm64: ## macOS Apple Silicon
 	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 \
 		go build -ldflags="$(LDFLAGS)" -o dist/$(BINARY)-macos-arm64 .
 	@echo "→ dist/$(BINARY)-macos-arm64"
 
-## macOS Intel
-build-mac-amd64:
+build-mac-amd64: ## macOS Intel
 	GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 \
 		go build -ldflags="$(LDFLAGS)" -o dist/$(BINARY)-macos-amd64 .
 	@echo "→ dist/$(BINARY)-macos-amd64"
 
-## Linux x86-64
-build-linux-amd64:
+build-linux-amd64: ## Linux x86-64
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
 		go build -ldflags="$(LDFLAGS)" -o dist/$(BINARY)-linux-amd64 .
 	@echo "→ dist/$(BINARY)-linux-amd64"
 
-## Linux ARM64
-build-linux-arm64:
+build-linux-arm64: ## Linux ARM64
 	GOOS=linux GOARCH=arm64 CGO_ENABLED=0 \
 		go build -ldflags="$(LDFLAGS)" -o dist/$(BINARY)-linux-arm64 .
 	@echo "→ dist/$(BINARY)-linux-arm64"
 
-## Windows x86-64
-build-windows-amd64:
+build-windows-amd64: ## Windows x86-64
 	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 \
 		go build -ldflags="$(LDFLAGS)" -o dist/$(BINARY)-windows-amd64.exe .
 	@echo "→ dist/$(BINARY)-windows-amd64.exe"
 
-## Windows ARM64
-build-windows-arm64:
+build-windows-arm64: ## Windows ARM64
 	GOOS=windows GOARCH=arm64 CGO_ENABLED=0 \
 		go build -ldflags="$(LDFLAGS)" -o dist/$(BINARY)-windows-arm64.exe .
 	@echo "→ dist/$(BINARY)-windows-arm64.exe"
 
-## Run locally
-run:
+run: ## Run locally  (ARGS="...")
 	go run . $(ARGS)
 
-## Install to /usr/local/bin if writable, otherwise ~/.local/bin
-install: build-mac-arm64
+install: build ## Build and install (/usr/local/bin if writable, else ~/.local/bin)
 	@if [ -w /usr/local/bin ]; then \
-		cp dist/$(BINARY)-macos-arm64 /usr/local/bin/$(BINARY); \
-		echo "Installed to /usr/local/bin/$(BINARY)"; \
+		cp dist/$(BINARY) /usr/local/bin/$(BINARY); \
+		echo "→ /usr/local/bin/$(BINARY)"; \
 	else \
 		mkdir -p $(HOME)/.local/bin; \
-		cp dist/$(BINARY)-macos-arm64 $(HOME)/.local/bin/$(BINARY); \
-		echo "Installed to $(HOME)/.local/bin/$(BINARY)"; \
+		cp dist/$(BINARY) $(HOME)/.local/bin/$(BINARY); \
+		echo "→ $(HOME)/.local/bin/$(BINARY)"; \
 	fi
 
-clean:
+clean: ## Remove build artifacts
 	rm -rf dist/
