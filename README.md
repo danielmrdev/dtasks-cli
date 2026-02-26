@@ -4,7 +4,7 @@
   <img src="assets/dtasks-logo.png" alt="dtasks logo" width="200">
 </p>
 
-[![CI](https://github.com/danielmrdev/dtasks-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/danielmrdev/dtasks-cli/actions/workflows/ci.yml)
+[![CI](https://github.com/danielmrdev/dtasks-cli/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/danielmrdev/dtasks-cli/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/danielmrdev/dtasks-cli?sort=semver)](https://github.com/danielmrdev/dtasks-cli/releases/latest)
 [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)](https://go.dev)
 [![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)](#install)
@@ -24,6 +24,14 @@ curl -fsSL https://raw.githubusercontent.com/danielmrdev/dtasks-cli/main/install
 
 Detects your OS and architecture, downloads the correct binary, verifies the SHA-256 checksum, and installs to `/usr/local/bin` (or `~/.local/bin` if you don't have write access).
 
+**Windows — install script (PowerShell)**
+
+```powershell
+irm https://raw.githubusercontent.com/danielmrdev/dtasks-cli/main/install.ps1 | iex
+```
+
+Installs to `%LOCALAPPDATA%\Programs\dtasks` and adds it to your user `PATH` automatically. No admin required.
+
 **Manual download**
 
 Download the latest binary for your platform from the [Releases](https://github.com/danielmrdev/dtasks-cli/releases/latest) page:
@@ -37,17 +45,7 @@ Download the latest binary for your platform from the [Releases](https://github.
 | Windows x86-64 | `dtasks-windows-amd64.exe` |
 | Windows ARM64 | `dtasks-windows-arm64.exe` |
 
-Each release includes a `checksums.txt` file with SHA-256 hashes.
-
-**Windows — install script (PowerShell)**
-
-```powershell
-irm https://raw.githubusercontent.com/danielmrdev/dtasks-cli/main/install.ps1 | iex
-```
-
-Installs to `%LOCALAPPDATA%\Programs\dtasks` and adds it to your user `PATH` automatically. No admin required.
-
-**Manual download** — download the `.exe` from the table above, place it somewhere in your `PATH`, and run from PowerShell or Command Prompt.
+Each release includes a `checksums.txt` file with SHA-256 hashes. Place the binary somewhere in your `PATH` and run it from your terminal or PowerShell.
 
 ## Build from source
 
