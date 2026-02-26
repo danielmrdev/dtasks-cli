@@ -12,7 +12,7 @@
 
 A fast, scriptable CLI task manager. Single static binary — no runtime dependencies, no daemon, no sync service.
 
-Tasks and lists live in a local SQLite database. The same file can be shared between a macOS host and a Linux container via a volume mount, making it a good fit for Docker-based workflows.
+Tasks and lists live in a local SQLite database. Point the database path to a shared folder (Dropbox, Google Drive, iCloud Drive, Syncthing…) to keep your tasks in sync across machines.
 
 ## Install
 
@@ -138,19 +138,22 @@ dtasks show 42 --json
 dtasks list ls --json
 ```
 
-## Shared database (Docker)
+## Shared database
 
-```yaml
-# docker-compose.yml
-services:
-  app:
-    volumes:
-      - ~/.local/share/dtasks:/data/dtasks
-    environment:
-      - DB_PATH=/data/dtasks/tasks.db
+Point `DB_PATH` to a folder synced by Dropbox, Google Drive, iCloud Drive, Syncthing, or any other file-sync service and dtasks will use the same database on every machine:
+
+```bash
+# ~/.config/dtasks/.env (Linux) or ~/.dtasks/.env (macOS)
+DB_PATH=/path/to/your/synced/folder/tasks.db
 ```
 
-Both the macOS host and the Linux container can point to the same file. The database uses WAL mode and a 5-second busy timeout to handle concurrent access safely.
+Or pass it inline for a one-off:
+
+```bash
+dtasks --db ~/Dropbox/tasks.db ls
+```
+
+The database uses WAL mode and a 5-second busy timeout to handle concurrent access safely.
 
 ## Global flags
 
