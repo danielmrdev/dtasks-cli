@@ -16,11 +16,17 @@ go build ./...
 # Build for the current platform
 make build              # → dist/dtasks (native OS/arch)
 
+# Build and install to ~/.local/bin for local testing
+make install            # build + cp dist/dtasks ~/.local/bin/dtasks
+
 # Build all release targets
 make build-all          # macos-arm64, macos-amd64, linux-amd64, linux-arm64, windows-amd64.exe, windows-arm64.exe → dist/
 
 # Publish a release (creates git tag + pushes → triggers GH Actions)
 make release TAG=v1.2.3
+
+# List all make targets
+make help
 
 # Tests
 go test ./...

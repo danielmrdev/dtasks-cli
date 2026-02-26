@@ -61,7 +61,10 @@ go build -o dtasks .
 Build all release targets at once:
 
 ```bash
-make build-all   # outputs to dist/
+make build        # native binary → dist/dtasks
+make install      # build + copy to ~/.local/bin
+make build-all    # all platforms → dist/
+make help         # list all targets
 ```
 
 ## First run
