@@ -78,6 +78,7 @@ var (
 var lsCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "List tasks",
+	Long:  "List tasks.\n\nColumn symbols:\n  DONE  ✓ = completed\n  AC    ✓ = auto-complete on due date",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		opts := repo.TaskListOptions{OnlyRoot: true}
 
