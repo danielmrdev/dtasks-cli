@@ -1,5 +1,9 @@
 # dtasks
 
+<p align="center">
+  <img src="assets/dtask-logo.png" alt="dtasks logo" width="200">
+</p>
+
 [![CI](https://github.com/danielmrdev/dtasks/actions/workflows/ci.yml/badge.svg)](https://github.com/danielmrdev/dtasks/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/danielmrdev/dtasks?sort=semver)](https://github.com/danielmrdev/dtasks/releases/latest)
 [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)](https://go.dev)
