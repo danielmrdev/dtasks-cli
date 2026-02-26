@@ -1,7 +1,7 @@
 # dtasks
 
 <p align="center">
-  <img src="assets/dtask-logo.png" alt="dtasks logo" width="200">
+  <img src="assets/dtasks-logo.png" alt="dtasks logo" width="200">
 </p>
 
 [![CI](https://github.com/danielmrdev/dtasks/actions/workflows/ci.yml/badge.svg)](https://github.com/danielmrdev/dtasks/actions/workflows/ci.yml)
