@@ -71,10 +71,16 @@ build-windows-arm64:
 run:
 	go run . $(ARGS)
 
-## Install to /usr/local/bin (macOS/Linux)
+## Install to /usr/local/bin if writable, otherwise ~/.local/bin
 install: build-mac-arm64
-	cp dist/$(BINARY)-macos-arm64 /usr/local/bin/$(BINARY)
-	@echo "Installed to /usr/local/bin/$(BINARY)"
+	@if [ -w /usr/local/bin ]; then \
+		cp dist/$(BINARY)-macos-arm64 /usr/local/bin/$(BINARY); \
+		echo "Installed to /usr/local/bin/$(BINARY)"; \
+	else \
+		mkdir -p $(HOME)/.local/bin; \
+		cp dist/$(BINARY)-macos-arm64 $(HOME)/.local/bin/$(BINARY); \
+		echo "Installed to $(HOME)/.local/bin/$(BINARY)"; \
+	fi
 
 clean:
 	rm -rf dist/
