@@ -24,8 +24,26 @@ var rootCmd = &cobra.Command{
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		output.JSONMode = jsonFlag
 
-		// Skip DB init for completion commands
-		if cmd.Name() == "__complete" || cmd.Name() == "help" {
+		// Skip DB init for the built-in completion script generator and help.
+		if isCompletionScript(cmd) || cmd.Name() == "help" {
+			return nil
+		}
+
+		// For shell completion queries (__complete/__completeNoDesc): open the
+		// DB silently so ValidArgsFunction can return dynamic suggestions.
+		// Suppress any errors — completions simply return empty on failure.
+		if cmd.Name() == "__complete" || cmd.Name() == "__completeNoDesc" {
+			dbPath := dbPathFlag
+			if dbPath == "" {
+				if _, statErr := os.Stat(config.EnvFilePath()); statErr == nil {
+					if cfg, loadErr := config.Load(); loadErr == nil {
+						dbPath = cfg.DBPath
+					}
+				}
+			}
+			if dbPath != "" {
+				DB, _ = db.Open(dbPath)
+			}
 			return nil
 		}
 

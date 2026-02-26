@@ -152,6 +152,39 @@ dtasks recur weekly 42 --every 1 --day fri
 # Every Friday: the task auto-completes and a new one is created for next week with the same time
 ```
 
+### Shell completion
+
+dtasks supports tab-completion for subcommands, flags, and dynamic values (task IDs, list IDs).
+
+**Bash**
+
+```bash
+source <(dtasks completion bash)
+# Permanent: add the line above to ~/.bashrc
+```
+
+**Zsh**
+
+```zsh
+dtasks completion zsh > "${fpath[1]}/_dtasks"
+# Then restart your shell or run: autoload -U compinit && compinit
+```
+
+**Fish**
+
+```fish
+dtasks completion fish | source
+# Permanent:
+dtasks completion fish > ~/.config/fish/completions/dtasks.fish
+```
+
+**PowerShell**
+
+```powershell
+dtasks completion powershell | Out-String | Invoke-Expression
+# Permanent: add the line above to your $PROFILE
+```
+
 ### JSON output
 
 All commands support `--json` for scripting and integration with other tools:

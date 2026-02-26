@@ -24,9 +24,10 @@ var (
 )
 
 var recurDailyCmd = &cobra.Command{
-	Use:   "daily <task-id>",
-	Short: "Set daily recurrence (e.g. every 3 days)",
-	Args:  cobra.ExactArgs(1),
+	Use:               "daily <task-id>",
+	Short:             "Set daily recurrence (e.g. every 3 days)",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completePendingTasks,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := parseID(args[0])
 		if err != nil {
@@ -52,9 +53,10 @@ var recurDailyCmd = &cobra.Command{
 }
 
 var recurWeeklyCmd = &cobra.Command{
-	Use:   "weekly <task-id>",
-	Short: "Set weekly recurrence (e.g. every 2 weeks on Thursday)",
-	Args:  cobra.ExactArgs(1),
+	Use:               "weekly <task-id>",
+	Short:             "Set weekly recurrence (e.g. every 2 weeks on Thursday)",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completePendingTasks,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := parseID(args[0])
 		if err != nil {
@@ -88,9 +90,10 @@ var recurWeeklyCmd = &cobra.Command{
 }
 
 var recurMonthlyCmd = &cobra.Command{
-	Use:   "monthly <task-id>",
-	Short: "Set monthly recurrence (e.g. every 3 months on day 1)",
-	Args:  cobra.ExactArgs(1),
+	Use:               "monthly <task-id>",
+	Short:             "Set monthly recurrence (e.g. every 3 months on day 1)",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completePendingTasks,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := parseID(args[0])
 		if err != nil {
@@ -123,9 +126,10 @@ var recurMonthlyCmd = &cobra.Command{
 }
 
 var recurRmCmd = &cobra.Command{
-	Use:   "rm <task-id>",
-	Short: "Remove recurrence from a task",
-	Args:  cobra.ExactArgs(1),
+	Use:               "rm <task-id>",
+	Short:             "Remove recurrence from a task",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completePendingTasks,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := parseID(args[0])
 		if err != nil {

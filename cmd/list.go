@@ -48,9 +48,10 @@ var listLsCmd = &cobra.Command{
 }
 
 var listRenameCmd = &cobra.Command{
-	Use:   "rename <id> <new-name>",
-	Short: "Rename a list",
-	Args:  cobra.ExactArgs(2),
+	Use:               "rename <id> <new-name>",
+	Short:             "Rename a list",
+	Args:              cobra.ExactArgs(2),
+	ValidArgsFunction: completeLists,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := strconv.ParseInt(args[0], 10, 64)
 		if err != nil {
@@ -65,9 +66,10 @@ var listRenameCmd = &cobra.Command{
 }
 
 var listRmCmd = &cobra.Command{
-	Use:   "rm <id>",
-	Short: "Delete a list (and all its tasks)",
-	Args:  cobra.ExactArgs(1),
+	Use:               "rm <id>",
+	Short:             "Delete a list (and all its tasks)",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completeLists,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := strconv.ParseInt(args[0], 10, 64)
 		if err != nil {
