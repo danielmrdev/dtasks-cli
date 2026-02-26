@@ -73,10 +73,10 @@ var recurWeeklyCmd = &cobra.Command{
 		}
 
 		r := repo.RecurInput{
-			Type:       "weekly",
-			Interval:   recurEvery,
-			DayOfWeek:  &dow,
-			EndsType:   resolveEndsType(cmd),
+			Type:      "weekly",
+			Interval:  recurEvery,
+			DayOfWeek: &dow,
+			EndsType:  resolveEndsType(cmd),
 		}
 		if cmd.Flags().Changed("time") {
 			r.Time = &recurTime
@@ -111,10 +111,10 @@ var recurMonthlyCmd = &cobra.Command{
 		}
 
 		r := repo.RecurInput{
-			Type:          "monthly",
-			Interval:      recurEvery,
-			DayOfMonth:    &recurDayNum,
-			EndsType:      resolveEndsType(cmd),
+			Type:       "monthly",
+			Interval:   recurEvery,
+			DayOfMonth: &recurDayNum,
+			EndsType:   resolveEndsType(cmd),
 		}
 		if cmd.Flags().Changed("time") {
 			r.Time = &recurTime

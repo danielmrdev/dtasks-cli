@@ -12,13 +12,13 @@ import (
 // --- add ---
 
 var (
-	addListID   int64
-	addParent   int64
-	addNotes    string
-	addDate     string
-	addTime     string
-	addDueDate  string
-	addDueTime  string
+	addListID  int64
+	addParent  int64
+	addNotes   string
+	addDate    string
+	addTime    string
+	addDueDate string
+	addDueTime string
 )
 
 var addCmd = &cobra.Command{

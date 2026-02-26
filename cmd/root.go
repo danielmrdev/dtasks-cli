@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	DB      *sql.DB
-	jsonFlag bool
+	DB         *sql.DB
+	jsonFlag   bool
 	dbPathFlag string
 )
 

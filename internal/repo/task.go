@@ -10,14 +10,14 @@ import (
 
 // TaskCreateInput holds fields for creating/updating a task.
 type TaskInput struct {
-	ListID          int64
-	ParentTaskID    *int64
-	Title           string
-	Notes           *string
-	Date            *string
-	Time            *string
-	DueDate         *string
-	DueTime         *string
+	ListID       int64
+	ParentTaskID *int64
+	Title        string
+	Notes        *string
+	Date         *string
+	Time         *string
+	DueDate      *string
+	DueTime      *string
 }
 
 func TaskCreate(db *sql.DB, in TaskInput) (*models.Task, error) {
@@ -202,15 +202,15 @@ func TaskDelete(db *sql.DB, id int64) error {
 // --- Recurrence ---
 
 type RecurInput struct {
-	Type        string // daily | weekly | monthly
-	Interval    int
-	Time        *string
-	DayOfWeek   *int
-	DayOfMonth  *int
-	Starts      *string
-	EndsType    string // never | on_date | after_n
-	EndsDate    *string
-	EndsAfter   *int
+	Type       string // daily | weekly | monthly
+	Interval   int
+	Time       *string
+	DayOfWeek  *int
+	DayOfMonth *int
+	Starts     *string
+	EndsType   string // never | on_date | after_n
+	EndsDate   *string
+	EndsAfter  *int
 }
 
 func TaskSetRecur(db *sql.DB, id int64, r RecurInput) error {
