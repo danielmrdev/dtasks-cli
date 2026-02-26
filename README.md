@@ -98,8 +98,11 @@ dtasks --db /path/to/tasks.db ls
 
 ```bash
 dtasks list create "Personal"
+dtasks list create "Work" --color "#0077ff"
 dtasks list ls
-dtasks list rename 1 "Home"
+dtasks list edit 1 --name "Home"
+dtasks list edit 1 --color "#ff6600"
+dtasks list edit 1 --no-color
 dtasks list rm 1
 ```
 

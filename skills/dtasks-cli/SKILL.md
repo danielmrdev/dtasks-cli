@@ -27,11 +27,16 @@ All state is read and written through the `dtasks` binary.
 Tasks must belong to a list. Always create a list first if none exist.
 
 ```bash
-dtasks list create "<name>"        # create — prints the new list with its ID
-dtasks list ls                     # show all lists (ID + name)
-dtasks list rename <id> "<name>"   # rename
-dtasks list rm <id>                # delete list AND all its tasks (irreversible)
+dtasks list create "<name>"                    # create — prints the new list with its ID
+dtasks list create "<name>" --color "#rrggbb"  # create with hex color
+dtasks list ls                                 # show all lists (ID + name + color dot)
+dtasks list edit <id> --name "<new name>"      # rename
+dtasks list edit <id> --color "#rrggbb"        # set or change color
+dtasks list edit <id> --no-color               # remove color
+dtasks list rm <id>                            # delete list AND all its tasks (irreversible)
 ```
+
+`--name` and `--color`/`--no-color` can be combined in a single call. `--color` and `--no-color` are mutually exclusive.
 
 **Getting a list ID:** run `dtasks list ls --json` and read `.id`.
 
@@ -135,7 +140,7 @@ dtasks edit "$id" --due 2026-03-01
 ```
 
 JSON shapes:
-- List: `{"id": 1, "name": "Work", "created_at": "..."}`
+- List: `{"id": 1, "name": "Work", "color": "#0077ff", "created_at": "..."}` (`color` is `null` if not set)
 - Task: `{"id": 42, "list_id": 1, "title": "...", "notes": "...", "due_date": "...", "due_time": "...", "completed": false, "autocomplete": false, "parent_task_id": null, "created_at": "..."}`
 
 ---
