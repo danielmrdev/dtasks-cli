@@ -1,4 +1,4 @@
-module github.com/dtasks/dtasks
+module github.com/danielmrdev/dtasks
 
 go 1.22
 

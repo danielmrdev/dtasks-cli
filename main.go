@@ -1,6 +1,6 @@
 package main
 
-import "github.com/dtasks/dtasks/cmd"
+import "github.com/danielmrdev/dtasks/cmd"
 
 // version is set at build time via -ldflags "-X main.version=<tag>".
 var version = "dev"

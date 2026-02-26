@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/dtasks/dtasks/internal/config"
+	"github.com/danielmrdev/dtasks/internal/config"
 )
 
 func TestDefaultDBPath_Linux(t *testing.T) {

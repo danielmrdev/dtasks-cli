@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dtasks/dtasks/internal/models"
-	"github.com/dtasks/dtasks/internal/output"
+	"github.com/danielmrdev/dtasks/internal/models"
+	"github.com/danielmrdev/dtasks/internal/output"
 )
 
 // captureStdout replaces os.Stdout temporarily and returns the captured output.

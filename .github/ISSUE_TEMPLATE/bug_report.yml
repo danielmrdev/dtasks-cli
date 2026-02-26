@@ -1,0 +1,60 @@
+name: Bug report
+description: Something isn't working as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a bug.
+
+  - type: input
+    id: version
+    attributes:
+      label: dtasks version
+      description: Output of `dtasks --version`
+      placeholder: "dtasks version v0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+        - Linux x86-64
+        - Linux ARM64
+        - Windows x86-64
+        - Windows ARM64
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: The exact command that triggered the bug
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include any error output
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that might be relevant (config file, DB path, etc.)

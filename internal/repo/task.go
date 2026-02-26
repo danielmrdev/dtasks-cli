@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dtasks/dtasks/internal/models"
+	"github.com/danielmrdev/dtasks/internal/models"
 )
 
 // TaskCreateInput holds fields for creating/updating a task.
