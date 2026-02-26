@@ -39,7 +39,15 @@ Download the latest binary for your platform from the [Releases](https://github.
 
 Each release includes a `checksums.txt` file with SHA-256 hashes.
 
-**Windows** — download the `.exe`, place it somewhere in your `PATH`, and run from PowerShell or Command Prompt.
+**Windows — install script (PowerShell)**
+
+```powershell
+irm https://raw.githubusercontent.com/danielmrdev/dtasks/main/install.ps1 | iex
+```
+
+Installs to `%LOCALAPPDATA%\Programs\dtasks` and adds it to your user `PATH` automatically. No admin required.
+
+**Manual download** — download the `.exe` from the table above, place it somewhere in your `PATH`, and run from PowerShell or Command Prompt.
 
 ## Build from source
 
