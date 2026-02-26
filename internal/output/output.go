@@ -63,7 +63,7 @@ func PrintTasks(tasks []models.Task) {
 	}
 
 	headers := []string{"ID", "LIST", "TITLE", "DUE", "✔", "AC"}
-	var rows [][]string
+	var plain, styled [][]string
 	for _, t := range tasks {
 		done := " "
 		if t.Completed {
@@ -77,16 +77,18 @@ func PrintTasks(tasks []models.Task) {
 		if t.Recurring {
 			title += " ↻"
 		}
-		rows = append(rows, []string{
-			strconv.FormatInt(t.ID, 10),
-			t.ListName,
-			title,
-			formatDate(t.DueDate, t.DueTime),
-			done,
-			ac,
-		})
+		id := strconv.FormatInt(t.ID, 10)
+		due := formatDate(t.DueDate, t.DueTime)
+		plainList := t.ListName
+		styledList := t.ListName
+		if t.ListColor != nil && *t.ListColor != "" {
+			plainList = "● " + t.ListName
+			styledList = colorDot(*t.ListColor) + " " + t.ListName
+		}
+		plain = append(plain, []string{id, plainList, title, due, done, ac})
+		styled = append(styled, []string{id, styledList, title, due, done, ac})
 	}
-	printBorderedTable(headers, rows, rows)
+	printBorderedTable(headers, plain, styled)
 }
 
 func PrintTask(t *models.Task) {
@@ -96,7 +98,11 @@ func PrintTask(t *models.Task) {
 	}
 	fmt.Printf("Task #%d\n", t.ID)
 	fmt.Printf("  Title       : %s\n", t.Title)
-	fmt.Printf("  List        : %s (#%d)\n", t.ListName, t.ListID)
+	listLabel := t.ListName
+	if t.ListColor != nil && *t.ListColor != "" {
+		listLabel = colorDot(*t.ListColor) + " " + t.ListName
+	}
+	fmt.Printf("  List        : %s (#%d)\n", listLabel, t.ListID)
 	if t.ParentTaskID != nil {
 		fmt.Printf("  Parent      : #%d\n", *t.ParentTaskID)
 	}

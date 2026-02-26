@@ -253,7 +253,7 @@ func boolToInt(b bool) int {
 
 const taskSelectSQL = `
 SELECT
-	t.id, t.list_id, l.name,
+	t.id, t.list_id, l.name, l.color,
 	t.parent_task_id, t.title, t.notes,
 	t.due_date, t.due_time,
 	t.completed, t.completed_at,
@@ -277,7 +277,7 @@ func scanTaskRow(s scanner) (*models.Task, error) {
 	t := &models.Task{}
 	var completedAt sql.NullString
 	err := s.Scan(
-		&t.ID, &t.ListID, &t.ListName,
+		&t.ID, &t.ListID, &t.ListName, &t.ListColor,
 		&t.ParentTaskID, &t.Title, &t.Notes,
 		&t.DueDate, &t.DueTime,
 		&t.Completed, &completedAt,

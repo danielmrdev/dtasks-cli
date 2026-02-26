@@ -103,10 +103,10 @@ var listRmCmd = &cobra.Command{
 }
 
 func init() {
-	listCreateCmd.Flags().StringVar(&createColor, "color", "", "hex color for the list (e.g. #22ff33)")
+	listCreateCmd.Flags().StringVar(&createColor, "color", "", `hex color for the list (e.g. "#22ff33")`)
 
 	listEditCmd.Flags().StringVar(&editName, "name", "", "New name")
-	listEditCmd.Flags().StringVar(&editColor, "color", "", "Hex color (e.g. #22ff33)")
+	listEditCmd.Flags().StringVar(&editColor, "color", "", `hex color (e.g. "#22ff33")`)
 	listEditCmd.Flags().BoolVar(&editNoColor, "no-color", false, "Remove the list color")
 
 	listCmd.AddCommand(listCreateCmd)
