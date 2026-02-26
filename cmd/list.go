@@ -14,12 +14,23 @@ var listCmd = &cobra.Command{
 	Short: "Manage lists",
 }
 
+var (
+	createColor string
+	editName    string
+	editColor   string
+	editNoColor bool
+)
+
 var listCreateCmd = &cobra.Command{
 	Use:   "create <name>",
 	Short: "Create a new list",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		l, err := repo.ListCreate(DB, args[0])
+		var color *string
+		if cmd.Flags().Changed("color") {
+			color = &createColor
+		}
+		l, err := repo.ListCreate(DB, args[0], color)
 		if err != nil {
 			return err
 		}
@@ -41,27 +52,43 @@ var listLsCmd = &cobra.Command{
 	},
 }
 
-var listRenameCmd = &cobra.Command{
-	Use:   "rename <id> <new-name>",
-	Short: "Rename a list",
-	Args:  cobra.ExactArgs(2),
+var listEditCmd = &cobra.Command{
+	Use:               "edit <id>",
+	Short:             "Edit a list",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completeLists,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if cmd.Flags().Changed("color") && editNoColor {
+			return fmt.Errorf("--color and --no-color are mutually exclusive")
+		}
 		id, err := strconv.ParseInt(args[0], 10, 64)
 		if err != nil {
 			return fmt.Errorf("invalid id: %s", args[0])
 		}
-		if err := repo.ListRename(DB, id, args[1]); err != nil {
+		p := repo.ListPatch{}
+		if cmd.Flags().Changed("name") {
+			p.Name = &editName
+		}
+		if cmd.Flags().Changed("color") {
+			p.Color = &editColor
+		} else if editNoColor {
+			empty := ""
+			p.Color = &empty
+		}
+		l, err := repo.ListPatchFields(DB, id, p)
+		if err != nil {
 			return err
 		}
-		output.PrintSuccess(fmt.Sprintf("List #%d renamed to %q", id, args[1]))
+		output.PrintList(l)
 		return nil
 	},
 }
 
 var listRmCmd = &cobra.Command{
-	Use:   "rm <id>",
-	Short: "Delete a list (and all its tasks)",
-	Args:  cobra.ExactArgs(1),
+	Use:               "rm <id>",
+	Short:             "Delete a list (and all its tasks)",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completeLists,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := strconv.ParseInt(args[0], 10, 64)
 		if err != nil {
@@ -76,8 +103,14 @@ var listRmCmd = &cobra.Command{
 }
 
 func init() {
+	listCreateCmd.Flags().StringVar(&createColor, "color", "", `hex color for the list (e.g. "#22ff33")`)
+
+	listEditCmd.Flags().StringVar(&editName, "name", "", "New name")
+	listEditCmd.Flags().StringVar(&editColor, "color", "", `hex color (e.g. "#22ff33")`)
+	listEditCmd.Flags().BoolVar(&editNoColor, "no-color", false, "Remove the list color")
+
 	listCmd.AddCommand(listCreateCmd)
 	listCmd.AddCommand(listLsCmd)
-	listCmd.AddCommand(listRenameCmd)
+	listCmd.AddCommand(listEditCmd)
 	listCmd.AddCommand(listRmCmd)
 }

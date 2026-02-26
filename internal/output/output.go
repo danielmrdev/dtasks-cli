@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/danielmrdev/dtasks-cli/internal/models"
+	"github.com/mattn/go-runewidth"
 )
 
 var JSONMode bool
@@ -23,12 +24,22 @@ func PrintLists(lists []models.List) {
 		fmt.Println("No lists found.")
 		return
 	}
-	w := newTabWriter()
-	fmt.Fprintln(w, "ID\tNAME\tCREATED")
+
+	headers := []string{"", "ID", "NAME", "CREATED"}
+	var plain, styled [][]string
 	for _, l := range lists {
-		fmt.Fprintf(w, "%d\t%s\t%s\n", l.ID, l.Name, l.CreatedAt.Format("2006-01-02"))
+		dot := " "
+		styledDot := " "
+		if l.Color != nil && *l.Color != "" {
+			dot = "●"
+			styledDot = colorDot(*l.Color)
+		}
+		id := strconv.FormatInt(l.ID, 10)
+		created := l.CreatedAt.Format("2006-01-02")
+		plain = append(plain, []string{dot, id, l.Name, created})
+		styled = append(styled, []string{styledDot, id, l.Name, created})
 	}
-	w.Flush()
+	printBorderedTable(headers, plain, styled)
 }
 
 func PrintList(l *models.List) {
@@ -50,8 +61,9 @@ func PrintTasks(tasks []models.Task) {
 		fmt.Println("No tasks found.")
 		return
 	}
-	w := newTabWriter()
-	fmt.Fprintln(w, "ID\tLIST\tTITLE\tDUE\tDONE\tAC")
+
+	headers := []string{"ID", "LIST", "TITLE", "DUE", "✔", "AC"}
+	var plain, styled [][]string
 	for _, t := range tasks {
 		done := " "
 		if t.Completed {
@@ -61,13 +73,22 @@ func PrintTasks(tasks []models.Task) {
 		if t.Autocomplete {
 			ac = "✓"
 		}
-		fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\n",
-			t.ID, t.ListName, t.Title,
-			formatDate(t.DueDate, t.DueTime),
-			done, ac,
-		)
+		title := t.Title
+		if t.Recurring {
+			title += " ↻"
+		}
+		id := strconv.FormatInt(t.ID, 10)
+		due := formatDate(t.DueDate, t.DueTime)
+		plainList := t.ListName
+		styledList := t.ListName
+		if t.ListColor != nil && *t.ListColor != "" {
+			plainList = "● " + t.ListName
+			styledList = colorDot(*t.ListColor) + " " + t.ListName
+		}
+		plain = append(plain, []string{id, plainList, title, due, done, ac})
+		styled = append(styled, []string{id, styledList, title, due, done, ac})
 	}
-	w.Flush()
+	printBorderedTable(headers, plain, styled)
 }
 
 func PrintTask(t *models.Task) {
@@ -77,7 +98,11 @@ func PrintTask(t *models.Task) {
 	}
 	fmt.Printf("Task #%d\n", t.ID)
 	fmt.Printf("  Title       : %s\n", t.Title)
-	fmt.Printf("  List        : %s (#%d)\n", t.ListName, t.ListID)
+	listLabel := t.ListName
+	if t.ListColor != nil && *t.ListColor != "" {
+		listLabel = colorDot(*t.ListColor) + " " + t.ListName
+	}
+	fmt.Printf("  List        : %s (#%d)\n", listLabel, t.ListID)
 	if t.ParentTaskID != nil {
 		fmt.Printf("  Parent      : #%d\n", *t.ParentTaskID)
 	}
@@ -121,11 +146,107 @@ func PrintError(msg string) {
 	fmt.Fprintln(os.Stderr, "Error: "+msg)
 }
 
-// --- Helpers ---
+// --- Table renderer ---
 
-func newTabWriter() *tabwriter.Writer {
-	return tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+// printBorderedTable renders a bordered table with bold headers.
+// plain holds visible-only text (used for column width calculation).
+// styled holds the same rows with optional ANSI codes (same visible width as plain).
+func printBorderedTable(headers []string, plain [][]string, styled [][]string) {
+	n := len(headers)
+	widths := make([]int, n)
+	for i, h := range headers {
+		widths[i] = runeWidth(h)
+	}
+	for _, row := range plain {
+		for i := 0; i < n && i < len(row); i++ {
+			if w := runeWidth(row[i]); w > widths[i] {
+				widths[i] = w
+			}
+		}
+	}
+
+	border := func(left, mid, right, fill string) string {
+		var sb strings.Builder
+		sb.WriteString(left)
+		for i, w := range widths {
+			sb.WriteString(strings.Repeat(fill, w+2))
+			if i < n-1 {
+				sb.WriteString(mid)
+			}
+		}
+		sb.WriteString(right)
+		return sb.String()
+	}
+
+	fmt.Println(border("┌", "┬", "┐", "─"))
+
+	var hdr strings.Builder
+	hdr.WriteString("│")
+	for i, h := range headers {
+		hdr.WriteString(" ")
+		hdr.WriteString(bold(h))
+		hdr.WriteString(strings.Repeat(" ", widths[i]-runeWidth(h)))
+		hdr.WriteString(" │")
+	}
+	fmt.Println(hdr.String())
+
+	fmt.Println(border("├", "┼", "┤", "─"))
+
+	for ri, row := range styled {
+		var line strings.Builder
+		line.WriteString("│")
+		for i := 0; i < n; i++ {
+			styledCell := ""
+			plainWidth := 0
+			if i < len(row) {
+				styledCell = row[i]
+			}
+			if ri < len(plain) && i < len(plain[ri]) {
+				plainWidth = runeWidth(plain[ri][i])
+			}
+			line.WriteString(" ")
+			line.WriteString(styledCell)
+			line.WriteString(strings.Repeat(" ", widths[i]-plainWidth))
+			line.WriteString(" │")
+		}
+		fmt.Println(line.String())
+	}
+
+	fmt.Println(border("└", "┴", "┘", "─"))
 }
+
+func runeWidth(s string) int {
+	return runewidth.StringWidth(s)
+}
+
+func bold(s string) string {
+	if s == "" {
+		return ""
+	}
+	return "\033[1m" + s + "\033[0m"
+}
+
+func colorDot(hex string) string {
+	r, g, b, err := hexToRGB(hex)
+	if err != nil {
+		return "●"
+	}
+	return fmt.Sprintf("\033[38;2;%d;%d;%dm●\033[0m", r, g, b)
+}
+
+func hexToRGB(hex string) (r, g, b uint8, err error) {
+	hex = strings.TrimPrefix(hex, "#")
+	if len(hex) != 6 {
+		return 0, 0, 0, fmt.Errorf("invalid hex color: %q", hex)
+	}
+	v, err := strconv.ParseUint(hex, 16, 32)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+	return uint8(v >> 16), uint8((v >> 8) & 0xff), uint8(v & 0xff), nil
+}
+
+// --- Helpers ---
 
 func printJSON(v any) {
 	enc := json.NewEncoder(os.Stdout)

@@ -98,8 +98,11 @@ dtasks --db /path/to/tasks.db ls
 
 ```bash
 dtasks list create "Personal"
+dtasks list create "Work" --color "#0077ff"
 dtasks list ls
-dtasks list rename 1 "Home"
+dtasks list edit 1 --name "Home"
+dtasks list edit 1 --color "#ff6600"
+dtasks list edit 1 --no-color
 dtasks list rm 1
 ```
 
@@ -150,6 +153,39 @@ Tasks with `--autocomplete` are completed automatically the next time any dtasks
 dtasks add --list 1 "Weekly review" --due 2026-03-07 --due-time 09:00 --autocomplete
 dtasks recur weekly 42 --every 1 --day fri
 # Every Friday: the task auto-completes and a new one is created for next week with the same time
+```
+
+### Shell completion
+
+dtasks supports tab-completion for subcommands, flags, and dynamic values (task IDs, list IDs).
+
+**Bash**
+
+```bash
+source <(dtasks completion bash)
+# Permanent: add the line above to ~/.bashrc
+```
+
+**Zsh**
+
+```zsh
+dtasks completion zsh > "${fpath[1]}/_dtasks"
+# Then restart your shell or run: autoload -U compinit && compinit
+```
+
+**Fish**
+
+```fish
+dtasks completion fish | source
+# Permanent:
+dtasks completion fish > ~/.config/fish/completions/dtasks.fish
+```
+
+**PowerShell**
+
+```powershell
+dtasks completion powershell | Out-String | Invoke-Expression
+# Permanent: add the line above to your $PROFILE
 ```
 
 ### JSON output

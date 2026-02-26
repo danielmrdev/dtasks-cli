@@ -5,6 +5,7 @@ import "time"
 type List struct {
 	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
+	Color     *string   `json:"color,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -12,6 +13,7 @@ type Task struct {
 	ID              int64      `json:"id"`
 	ListID          int64      `json:"list_id"`
 	ListName        string     `json:"list_name"`
+	ListColor       *string    `json:"list_color,omitempty"`
 	ParentTaskID    *int64     `json:"parent_task_id,omitempty"`
 	Title           string     `json:"title"`
 	Notes           *string    `json:"notes,omitempty"`

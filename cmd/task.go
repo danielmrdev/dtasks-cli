@@ -65,6 +65,8 @@ func init() {
 	addCmd.Flags().StringVar(&addDueDate, "due", "", "Due date (YYYY-MM-DD)")
 	addCmd.Flags().StringVar(&addDueTime, "due-time", "", "Due time (HH:MM, requires --due)")
 	addCmd.Flags().BoolVar(&addAutocomplete, "autocomplete", false, "Auto-complete when due date passes")
+	_ = addCmd.RegisterFlagCompletionFunc("list", completeLists)
+	_ = addCmd.RegisterFlagCompletionFunc("parent", completePendingTasks)
 }
 
 // --- ls ---
@@ -106,14 +108,16 @@ func init() {
 	lsCmd.Flags().Int64VarP(&lsListID, "list", "l", 0, "Filter by list ID")
 	lsCmd.Flags().BoolVar(&lsAll, "all", false, "Include completed tasks")
 	lsCmd.Flags().BoolVar(&lsDueToday, "due-today", false, "Only tasks due today or overdue")
+	_ = lsCmd.RegisterFlagCompletionFunc("list", completeLists)
 }
 
 // --- show ---
 
 var showCmd = &cobra.Command{
-	Use:   "show <id>",
-	Short: "Show full task detail",
-	Args:  cobra.ExactArgs(1),
+	Use:               "show <id>",
+	Short:             "Show full task detail",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completeAllTasks,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := parseID(args[0])
 		if err != nil {
@@ -150,9 +154,10 @@ var (
 )
 
 var editCmd = &cobra.Command{
-	Use:   "edit <id>",
-	Short: "Edit a task",
-	Args:  cobra.ExactArgs(1),
+	Use:               "edit <id>",
+	Short:             "Edit a task",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completePendingTasks,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if cmd.Flags().Changed("due-time") && !cmd.Flags().Changed("due") {
 			return fmt.Errorf("--due-time requires --due")
@@ -198,14 +203,16 @@ func init() {
 	editCmd.Flags().StringVar(&editDueTime, "due-time", "", "Due time (HH:MM, requires --due)")
 	editCmd.Flags().Int64VarP(&editListID, "list", "l", 0, "Move to list ID")
 	editCmd.Flags().BoolVar(&editAutocomplete, "autocomplete", false, "Enable/disable autocomplete")
+	_ = editCmd.RegisterFlagCompletionFunc("list", completeLists)
 }
 
 // --- done / undone ---
 
 var doneCmd = &cobra.Command{
-	Use:   "done <id>",
-	Short: "Mark a task as completed",
-	Args:  cobra.ExactArgs(1),
+	Use:               "done <id>",
+	Short:             "Mark a task as completed",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completePendingTasks,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := parseID(args[0])
 		if err != nil {
@@ -229,9 +236,10 @@ var doneCmd = &cobra.Command{
 }
 
 var undoneCmd = &cobra.Command{
-	Use:   "undone <id>",
-	Short: "Mark a task as pending",
-	Args:  cobra.ExactArgs(1),
+	Use:               "undone <id>",
+	Short:             "Mark a task as pending",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completeCompletedTasks,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := parseID(args[0])
 		if err != nil {
@@ -248,9 +256,10 @@ var undoneCmd = &cobra.Command{
 // --- rm ---
 
 var rmCmd = &cobra.Command{
-	Use:   "rm <id>",
-	Short: "Delete a task",
-	Args:  cobra.ExactArgs(1),
+	Use:               "rm <id>",
+	Short:             "Delete a task",
+	Args:              cobra.ExactArgs(1),
+	ValidArgsFunction: completeAllTasks,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := parseID(args[0])
 		if err != nil {
