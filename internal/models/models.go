@@ -5,6 +5,7 @@ import "time"
 type List struct {
 	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
+	Color     *string   `json:"color,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	_ "modernc.org/sqlite"
 )
@@ -51,6 +52,7 @@ func migrate(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS lists (
 		id         INTEGER PRIMARY KEY AUTOINCREMENT,
 		name       TEXT NOT NULL UNIQUE,
+		color      TEXT,
 		created_at DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
 	);
 
@@ -86,6 +88,13 @@ func migrate(db *sql.DB) error {
 		return err
 	}
 
+	// Idempotent: add color column to existing DBs that predate this migration.
+	if _, alterErr := db.Exec(`ALTER TABLE lists ADD COLUMN color TEXT`); alterErr != nil {
+		if !strings.Contains(alterErr.Error(), "duplicate column name") {
+			return fmt.Errorf("add lists.color: %w", alterErr)
+		}
+	}
+
 	// Add autocomplete column if missing (existing DBs)
 	var count int
 	db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('tasks') WHERE name='autocomplete'`).Scan(&count)
@@ -114,5 +123,6 @@ func migrate(db *sql.DB) error {
 			}
 		}
 	}
+
 	return nil
 }

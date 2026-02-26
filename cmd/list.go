@@ -14,12 +14,18 @@ var listCmd = &cobra.Command{
 	Short: "Manage lists",
 }
 
+var createColor string
+
 var listCreateCmd = &cobra.Command{
 	Use:   "create <name>",
 	Short: "Create a new list",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		l, err := repo.ListCreate(DB, args[0])
+		var color *string
+		if cmd.Flags().Changed("color") {
+			color = &createColor
+		}
+		l, err := repo.ListCreate(DB, args[0], color)
 		if err != nil {
 			return err
 		}
@@ -76,6 +82,8 @@ var listRmCmd = &cobra.Command{
 }
 
 func init() {
+	listCreateCmd.Flags().StringVar(&createColor, "color", "", "hex color for the list (e.g. #22ff33)")
+
 	listCmd.AddCommand(listCreateCmd)
 	listCmd.AddCommand(listLsCmd)
 	listCmd.AddCommand(listRenameCmd)

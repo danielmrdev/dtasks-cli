@@ -33,7 +33,7 @@ func openTestDB(t *testing.T) *sql.DB {
 func TestListCreate(t *testing.T) {
 	d := openTestDB(t)
 
-	l, err := repo.ListCreate(d, "Work")
+	l, err := repo.ListCreate(d, "Work", nil)
 	if err != nil {
 		t.Fatalf("ListCreate() error = %v", err)
 	}
@@ -48,10 +48,10 @@ func TestListCreate(t *testing.T) {
 func TestListCreate_Duplicate(t *testing.T) {
 	d := openTestDB(t)
 
-	if _, err := repo.ListCreate(d, "Personal"); err != nil {
+	if _, err := repo.ListCreate(d, "Personal", nil); err != nil {
 		t.Fatal(err)
 	}
-	_, err := repo.ListCreate(d, "Personal")
+	_, err := repo.ListCreate(d, "Personal", nil)
 	if err == nil {
 		t.Error("expected error for duplicate list name, got nil")
 	}
@@ -61,7 +61,7 @@ func TestListAll(t *testing.T) {
 	d := openTestDB(t)
 
 	for _, name := range []string{"Alpha", "Beta", "Gamma"} {
-		if _, err := repo.ListCreate(d, name); err != nil {
+		if _, err := repo.ListCreate(d, name, nil); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -78,7 +78,7 @@ func TestListAll(t *testing.T) {
 func TestListGet(t *testing.T) {
 	d := openTestDB(t)
 
-	created, err := repo.ListCreate(d, "MyList")
+	created, err := repo.ListCreate(d, "MyList", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +95,7 @@ func TestListGet(t *testing.T) {
 func TestListRename(t *testing.T) {
 	d := openTestDB(t)
 
-	l, err := repo.ListCreate(d, "OldName")
+	l, err := repo.ListCreate(d, "OldName", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,7 +116,7 @@ func TestListRename(t *testing.T) {
 func TestListDelete(t *testing.T) {
 	d := openTestDB(t)
 
-	l, err := repo.ListCreate(d, "ToDelete")
+	l, err := repo.ListCreate(d, "ToDelete", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -155,7 +155,7 @@ func TestListDelete_NotFound(t *testing.T) {
 func TestTaskCreate(t *testing.T) {
 	d := openTestDB(t)
 
-	l, err := repo.ListCreate(d, "Work")
+	l, err := repo.ListCreate(d, "Work", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +181,7 @@ func TestTaskCreate(t *testing.T) {
 func TestTaskCreate_WithDue(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-03-01"
 	dueTime := "10:00"
 
@@ -205,7 +205,7 @@ func TestTaskCreate_WithDue(t *testing.T) {
 func TestTaskGet(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	created, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Fetch me"})
 
 	got, err := repo.TaskGet(d, created.ID)
@@ -220,7 +220,7 @@ func TestTaskGet(t *testing.T) {
 func TestTaskList(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	for _, title := range []string{"Task A", "Task B", "Task C"} {
 		repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: title})
 	}
@@ -238,8 +238,8 @@ func TestTaskList(t *testing.T) {
 func TestTaskList_FilterByList(t *testing.T) {
 	d := openTestDB(t)
 
-	l1, _ := repo.ListCreate(d, "List1")
-	l2, _ := repo.ListCreate(d, "List2")
+	l1, _ := repo.ListCreate(d, "List1", nil)
+	l2, _ := repo.ListCreate(d, "List2", nil)
 	repo.TaskCreate(d, repo.TaskInput{ListID: l1.ID, Title: "In L1"})
 	repo.TaskCreate(d, repo.TaskInput{ListID: l2.ID, Title: "In L2"})
 
@@ -258,7 +258,7 @@ func TestTaskList_FilterByList(t *testing.T) {
 func TestTaskDone(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Do it"})
 
 	if err := repo.TaskDone(d, task.ID, true); err != nil {
@@ -282,7 +282,7 @@ func TestTaskDone(t *testing.T) {
 func TestTaskDelete(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Delete me"})
 
 	if err := repo.TaskDelete(d, task.ID); err != nil {
@@ -306,7 +306,7 @@ func TestTaskDelete_NotFound(t *testing.T) {
 func TestTaskPatchFields(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Original"})
 
 	newTitle := "Updated"
@@ -322,7 +322,7 @@ func TestTaskPatchFields(t *testing.T) {
 func TestTaskSetRecur(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Recurring task"})
 
 	err := repo.TaskSetRecur(d, task.ID, repo.RecurInput{
@@ -346,7 +346,7 @@ func TestTaskSetRecur(t *testing.T) {
 func TestTaskRemoveRecur(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Was recurring"})
 	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "daily", Interval: 1, EndsType: "never"})
 
@@ -363,7 +363,7 @@ func TestTaskRemoveRecur(t *testing.T) {
 func TestTaskCreate_Subtask(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	parent, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Parent"})
 
 	child, err := repo.TaskCreate(d, repo.TaskInput{
@@ -382,7 +382,7 @@ func TestTaskCreate_Subtask(t *testing.T) {
 func TestListDelete_CascadesTasks(t *testing.T) {
 	d := openTestDB(t)
 
-	l, _ := repo.ListCreate(d, "ToDelete")
+	l, _ := repo.ListCreate(d, "ToDelete", nil)
 	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Task in list"})
 
 	if err := repo.ListDelete(d, l.ID); err != nil {
@@ -403,7 +403,7 @@ func TestListDelete_CascadesTasks(t *testing.T) {
 
 func TestScheduler_Daily(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-02-26"
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Daily task", DueDate: &due})
 	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "daily", Interval: 1, EndsType: "never"})
@@ -423,7 +423,7 @@ func TestScheduler_Daily(t *testing.T) {
 
 func TestScheduler_Weekly(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-02-26"
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Weekly task", DueDate: &due})
 	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "weekly", Interval: 2, EndsType: "never"})
@@ -442,7 +442,7 @@ func TestScheduler_Weekly(t *testing.T) {
 
 func TestScheduler_Monthly(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-01-15"
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Monthly task", DueDate: &due})
 	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "monthly", Interval: 1, EndsType: "never"})
@@ -461,7 +461,7 @@ func TestScheduler_Monthly(t *testing.T) {
 
 func TestScheduler_Monthly_DayClamp(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-01-31"
 	day := 31
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "End of month", DueDate: &due})
@@ -483,7 +483,7 @@ func TestScheduler_Monthly_DayClamp(t *testing.T) {
 
 func TestScheduler_EndsAfterN_Creates(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-02-26"
 	endsAfter := 3
 	count := 2
@@ -506,7 +506,7 @@ func TestScheduler_EndsAfterN_Creates(t *testing.T) {
 
 func TestScheduler_EndsAfterN_Stops(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-02-26"
 	endsAfter := 3
 	count := 3
@@ -526,7 +526,7 @@ func TestScheduler_EndsAfterN_Stops(t *testing.T) {
 
 func TestScheduler_EndsOnDate_Creates(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-03-05"
 	endsDate := "2026-03-15"
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "On date", DueDate: &due})
@@ -545,7 +545,7 @@ func TestScheduler_EndsOnDate_Creates(t *testing.T) {
 
 func TestScheduler_EndsOnDate_Stops(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-03-01"
 	endsDate := "2026-03-01"
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Expired", DueDate: &due})
@@ -564,7 +564,7 @@ func TestScheduler_EndsOnDate_Stops(t *testing.T) {
 
 func TestScheduler_NonRecurring(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "One shot"})
 
 	next, err := repo.TaskScheduleNext(d, task.ID)
@@ -578,7 +578,7 @@ func TestScheduler_NonRecurring(t *testing.T) {
 
 func TestScheduler_InheritsFields(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	due := "2026-02-26"
 	dueTime := "09:00"
 	notes := "important notes"
@@ -602,7 +602,7 @@ func TestScheduler_InheritsFields(t *testing.T) {
 
 func TestScheduler_NilDueDate(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "No due"})
 	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "daily", Interval: 1, EndsType: "never"})
 
@@ -623,7 +623,7 @@ func TestScheduler_NilDueDate(t *testing.T) {
 
 func TestAutocomplete_MarksAsDone(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	yesterday := "2026-02-25"
 	task, _ := repo.TaskCreate(d, repo.TaskInput{
 		ListID:       l.ID,
@@ -644,7 +644,7 @@ func TestAutocomplete_MarksAsDone(t *testing.T) {
 
 func TestAutocomplete_NotYetDue(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	tomorrow := "2026-02-27"
 	task, _ := repo.TaskCreate(d, repo.TaskInput{
 		ListID:       l.ID,
@@ -665,7 +665,7 @@ func TestAutocomplete_NotYetDue(t *testing.T) {
 
 func TestAutocomplete_RecurringChain(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	yesterday := "2026-02-25"
 	task, _ := repo.TaskCreate(d, repo.TaskInput{
 		ListID:       l.ID,
@@ -699,7 +699,7 @@ func TestAutocomplete_RecurringChain(t *testing.T) {
 
 func TestRecurCount_UpdatedOnOriginalAfterSpawn(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	yesterday := "2026-02-25"
 	endsAfter := 2
 	task, _ := repo.TaskCreate(d, repo.TaskInput{
@@ -728,7 +728,7 @@ func TestRecurCount_UpdatedOnOriginalAfterSpawn(t *testing.T) {
 
 func TestAutocomplete_NonAutocomplete(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	yesterday := "2026-02-25"
 	task, _ := repo.TaskCreate(d, repo.TaskInput{
 		ListID:  l.ID,
@@ -749,7 +749,7 @@ func TestAutocomplete_NonAutocomplete(t *testing.T) {
 
 func TestAutocomplete_DueTimeNotYetPassed(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	today := time.Now().Format("2006-01-02")
 	futureTime := time.Now().Add(2 * time.Hour).Format("15:04")
 	task, _ := repo.TaskCreate(d, repo.TaskInput{
@@ -772,7 +772,7 @@ func TestAutocomplete_DueTimeNotYetPassed(t *testing.T) {
 
 func TestAutocomplete_DueTimePassed(t *testing.T) {
 	d := openTestDB(t)
-	l, _ := repo.ListCreate(d, "Test")
+	l, _ := repo.ListCreate(d, "Test", nil)
 	today := time.Now().Format("2006-01-02")
 	pastTime := time.Now().Add(-2 * time.Hour).Format("15:04")
 	task, _ := repo.TaskCreate(d, repo.TaskInput{
