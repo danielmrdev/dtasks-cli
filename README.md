@@ -16,6 +16,16 @@ Tasks and lists live in a local SQLite database. Point the database path to a sh
 
 ## Install
 
+**macOS / Linux — install script**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/danielmrdev/dtasks/main/install.sh | sh
+```
+
+Detects your OS and architecture, downloads the correct binary, verifies the SHA-256 checksum, and installs to `/usr/local/bin` (or `~/.local/bin` if you don't have write access).
+
+**Manual download**
+
 Download the latest binary for your platform from the [Releases](https://github.com/danielmrdev/dtasks/releases/latest) page:
 
 | Platform | File |
@@ -28,15 +38,6 @@ Download the latest binary for your platform from the [Releases](https://github.
 | Windows ARM64 | `dtasks-windows-arm64.exe` |
 
 Each release includes a `checksums.txt` file with SHA-256 hashes.
-
-**macOS / Linux**
-
-```bash
-# Example: Linux amd64
-curl -Lo dtasks https://github.com/danielmrdev/dtasks/releases/latest/download/dtasks-linux-amd64
-chmod +x dtasks
-sudo mv dtasks /usr/local/bin/
-```
 
 **Windows** — download the `.exe`, place it somewhere in your `PATH`, and run from PowerShell or Command Prompt.
 
