@@ -1,19 +1,19 @@
 # CLAUDE.md — dtasks
 
-## Qué es esto
+## What this is
 
-CLI task manager escrito en Go. Binario estático, sin runtime deps. SQLite como base de datos. Pensado para correr en macOS y Linux (incluyendo Docker), compartiendo el mismo fichero `.db` vía volumen o carpeta sincronizada.
+CLI task manager written in Go. Single static binary, no runtime dependencies. SQLite as the database. Designed to run on macOS and Linux (including Docker), sharing the same `.db` file via a volume or synced folder.
 
-## Build y test
+## Build and test
 
 ```bash
-# Dependencias (primera vez — requiere red; usa goproxy.io si proxy.golang.org falla)
+# Dependencies (first time — requires network; use goproxy.io if proxy.golang.org fails)
 GOPROXY=https://goproxy.io,direct go mod tidy
 
-# Compilar para el sistema actual
+# Build for the current system
 go build ./...
 
-# Compilar todos los targets
+# Build all targets
 make build-all          # darwin-arm64, linux-amd64, linux-arm64 → dist/
 
 # Tests
@@ -24,77 +24,77 @@ go test ./internal/... -v   # verbose
 go vet ./...
 ```
 
-> **Nota sobre dependencias:** `proxy.golang.org` redirige las descargas a `storage.googleapis.com`, que puede estar bloqueado en este entorno. Usar `GOPROXY=https://goproxy.io,direct` como workaround.
+> **Dependency note:** `proxy.golang.org` redirects downloads to `storage.googleapis.com`, which may be blocked in this environment. Use `GOPROXY=https://goproxy.io,direct` as a workaround.
 
-## Estructura
+## Structure
 
 ```
 dtasks/
-├── main.go                   # entrypoint, llama a cmd.Execute()
+├── main.go                   # entrypoint, calls cmd.Execute()
 ├── cmd/
-│   ├── root.go               # cobra root, flags globales (--json, --db), inicializa DB
-│   ├── list.go               # subcomando list (create/ls/rename/rm)
+│   ├── root.go               # cobra root, global flags (--json, --db), initialises DB
+│   ├── list.go               # list subcommand (create/ls/rename/rm)
 │   ├── task.go               # add, ls, show, edit, done, undone, rm
 │   └── recur.go              # recur daily/weekly/monthly/rm
 ├── internal/
-│   ├── config/config.go      # carga .env, first-run wizard
-│   ├── db/db.go              # abre SQLite, aplica PRAGMAs, ejecuta migración
-│   ├── models/models.go      # structs List y Task
+│   ├── config/config.go      # loads .env, first-run wizard
+│   ├── db/db.go              # opens SQLite, applies PRAGMAs, runs migration
+│   ├── models/models.go      # List and Task structs
 │   ├── repo/
-│   │   ├── list.go           # CRUD de listas
-│   │   └── task.go           # CRUD de tareas + recurrencia
-│   └── output/output.go      # imprime en tabla o JSON (controlado por output.JSONMode)
+│   │   ├── list.go           # list CRUD
+│   │   └── task.go           # task CRUD + recurrence
+│   └── output/output.go      # prints as table or JSON (controlled by output.JSONMode)
 └── Makefile
 ```
 
-## Arquitectura
+## Architecture
 
-- **Entrada:** `cmd/root.go` usa `PersistentPreRunE` para abrir la DB antes de cualquier subcomando. La variable global `cmd.DB *sql.DB` se pasa directamente a las funciones de `repo`.
-- **Config:** `internal/config` busca `DB_PATH` en el fichero `.env` específico de plataforma. Si no existe, lanza un wizard interactivo que pregunta la ruta y crea el fichero.
-- **DB:** `internal/db` abre SQLite con WAL + busy_timeout y ejecuta el `CREATE TABLE IF NOT EXISTS` en cada arranque (migración idempotente).
-- **Repo:** funciones puras que reciben `*sql.DB` y devuelven modelos o error. Sin estado global en este paquete.
-- **Output:** `output.JSONMode` es un bool global que se activa con `--json`. Todas las funciones de impresión lo comprueban.
+- **Entry:** `cmd/root.go` uses `PersistentPreRunE` to open the DB before any subcommand runs. The global `cmd.DB *sql.DB` is passed directly to `repo` functions.
+- **Config:** `internal/config` looks for `DB_PATH` in the platform-specific `.env` file. If not found, it launches an interactive wizard that asks for the path and creates the file.
+- **DB:** `internal/db` opens SQLite with WAL + busy_timeout and runs `CREATE TABLE IF NOT EXISTS` on every startup (idempotent migration).
+- **Repo:** pure functions that take `*sql.DB` and return models or an error. No global state in this package.
+- **Output:** `output.JSONMode` is a global bool activated by `--json`. All print functions check it.
 
-## Convenciones de código
+## Code conventions
 
-- Fechas: `YYYY-MM-DD` como `string` (puntero `*string` cuando es nullable).
-- Horas: `HH:MM` como `string`.
-- IDs de DB: `int64`.
-- Flags opcionales: se comprueban con `cmd.Flags().Changed("flag")` antes de asignar al struct de input, para distinguir "no dado" de "dado con valor vacío".
-- `TaskPatch` para edición parcial (solo actualiza los campos no-nil).
-- Driver SQLite: `modernc.org/sqlite` (pure Go, CGO_ENABLED=0). El driver se registra con el nombre `"sqlite"`.
+- Dates: `YYYY-MM-DD` as `string` (`*string` pointer when nullable).
+- Times: `HH:MM` as `string`.
+- DB IDs: `int64`.
+- Optional flags: checked with `cmd.Flags().Changed("flag")` before assigning to the input struct, to distinguish "not provided" from "provided with empty value".
+- `TaskPatch` for partial edits (only updates non-nil fields).
+- SQLite driver: `modernc.org/sqlite` (pure Go, `CGO_ENABLED=0`). Registered under the driver name `"sqlite"`.
 
 ## Config paths
 
-| Plataforma | Config             | DB por defecto                               |
-|------------|--------------------|----------------------------------------------|
-| macOS      | `~/.dtasks/.env`   | `~/Library/Application Support/dtasks/tasks.db` |
-| Linux      | `~/.config/dtasks/.env` (respeta `$XDG_CONFIG_HOME`) | `~/.local/share/dtasks/tasks.db` (respeta `$XDG_DATA_HOME`) |
+| Platform | Config | Default DB |
+|----------|--------|------------|
+| macOS | `~/.dtasks/.env` | `~/Library/Application Support/dtasks/tasks.db` |
+| Linux | `~/.config/dtasks/.env` (respects `$XDG_CONFIG_HOME`) | `~/.local/share/dtasks/tasks.db` (respects `$XDG_DATA_HOME`) |
 
-## Tests existentes
+## Existing tests
 
-Los tests están en `internal/` junto al paquete que prueban:
+Tests live in `internal/` next to the package they cover:
 
-| Fichero | Qué cubre |
+| File | Covers |
 |---|---|
-| `internal/db/db_test.go` | `Open`, creación de dirs, migración de esquema |
-| `internal/config/config_test.go` | `DefaultDBPath`, `EnvFilePath`, `Load` desde `.env` |
-| `internal/output/output_test.go` | Salida tabla y JSON para lists/tasks/success/error |
-| `internal/repo/repo_test.go` | CRUD completo listas y tareas, filtros, done/undone, subtareas, recurrencia, cascade delete |
+| `internal/db/db_test.go` | `Open`, directory creation, schema migration |
+| `internal/config/config_test.go` | `DefaultDBPath`, `EnvFilePath`, `Load` from `.env` |
+| `internal/output/output_test.go` | Table and JSON output for lists/tasks/success/error |
+| `internal/repo/repo_test.go` | Full CRUD for lists and tasks, filters, done/undone, subtasks, recurrence, cascade delete |
 
-Los tests de `repo` y `db` crean una DB SQLite temporal con `os.CreateTemp` y la limpian con `t.Cleanup`.
+`repo` and `db` tests create a temporary SQLite DB with `os.CreateTemp` and clean up with `t.Cleanup`.
 
-## Dependencias clave
+## Key dependencies
 
-| Módulo | Uso |
+| Module | Purpose |
 |---|---|
-| `modernc.org/sqlite v1.29.0` | Driver SQLite pure-Go |
-| `github.com/spf13/cobra v1.8.0` | Framework CLI |
-| `github.com/joho/godotenv v1.5.1` | Lectura de ficheros `.env` |
+| `modernc.org/sqlite v1.29.0` | Pure-Go SQLite driver |
+| `github.com/spf13/cobra v1.8.0` | CLI framework |
+| `github.com/joho/godotenv v1.5.1` | `.env` file loading |
 
-## Qué falta (v1 out of scope)
+## Not implemented (v1 out of scope)
 
-- Notificaciones del sistema
-- Sync / backend cloud
-- Tags, prioridades, adjuntos
-- La lógica de "crear siguiente ocurrencia" para tareas recurrentes (los campos de recurrencia se guardan pero no hay scheduler)
+- System notifications
+- Sync / cloud backend
+- Tags, priorities, attachments
+- Scheduler logic to create the next occurrence of a recurring task — the recurrence fields are stored in the DB but nothing reads them to generate future tasks.
