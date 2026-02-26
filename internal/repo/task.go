@@ -199,7 +199,6 @@ func TaskDelete(db *sql.DB, id int64) error {
 type RecurInput struct {
 	Type       string // daily | weekly | monthly
 	Interval   int
-	Time       *string
 	DayOfWeek  *int
 	DayOfMonth *int
 	Starts     *string
@@ -217,13 +216,13 @@ func TaskSetRecur(db *sql.DB, id int64, r RecurInput) error {
 	_, err := db.Exec(`
 		UPDATE tasks SET
 			recurring = 1,
-			recur_type = ?, recur_interval = ?, recur_time = ?,
+			recur_type = ?, recur_interval = ?,
 			recur_day_of_week = ?, recur_day_of_month = ?,
 			recur_starts = ?, recur_ends_type = ?,
 			recur_ends_date = ?, recur_ends_after = ?,
 			recur_count = ?
 		WHERE id = ?`,
-		r.Type, r.Interval, r.Time,
+		r.Type, r.Interval,
 		r.DayOfWeek, r.DayOfMonth,
 		r.Starts, r.EndsType,
 		r.EndsDate, r.EndsAfter,
@@ -236,7 +235,7 @@ func TaskRemoveRecur(db *sql.DB, id int64) error {
 	_, err := db.Exec(`
 		UPDATE tasks SET
 			recurring = 0, recur_type = NULL, recur_interval = 1,
-			recur_time = NULL, recur_day_of_week = NULL, recur_day_of_month = NULL,
+			recur_day_of_week = NULL, recur_day_of_month = NULL,
 			recur_starts = NULL, recur_ends_type = NULL,
 			recur_ends_date = NULL, recur_ends_after = NULL, recur_count = 0
 		WHERE id = ?`, id)
@@ -258,7 +257,7 @@ SELECT
 	t.parent_task_id, t.title, t.notes,
 	t.due_date, t.due_time,
 	t.completed, t.completed_at,
-	t.recurring, t.recur_type, t.recur_interval, t.recur_time,
+	t.recurring, t.recur_type, t.recur_interval,
 	t.recur_day_of_week, t.recur_day_of_month,
 	t.recur_starts, t.recur_ends_type, t.recur_ends_date, t.recur_ends_after,
 	t.recur_count, t.autocomplete, t.created_at
@@ -282,7 +281,7 @@ func scanTaskRow(s scanner) (*models.Task, error) {
 		&t.ParentTaskID, &t.Title, &t.Notes,
 		&t.DueDate, &t.DueTime,
 		&t.Completed, &completedAt,
-		&t.Recurring, &t.RecurType, &t.RecurInterval, &t.RecurTime,
+		&t.Recurring, &t.RecurType, &t.RecurInterval,
 		&t.RecurDayOfWeek, &t.RecurDayOfMonth,
 		&t.RecurStarts, &t.RecurEndsType, &t.RecurEndsDate, &t.RecurEndsAfter,
 		&t.RecurCount, &t.Autocomplete, &t.CreatedAt,

@@ -97,7 +97,7 @@ func TaskScheduleNext(db *sql.DB, id int64) (*models.Task, error) {
 	res, err := tx.Exec(`
 		INSERT INTO tasks (list_id, title, notes, due_date, due_time, autocomplete)
 		VALUES (?, ?, ?, ?, ?, ?)`,
-		t.ListID, t.Title, t.Notes, nextDate, t.RecurTime, autocompleteVal,
+		t.ListID, t.Title, t.Notes, nextDate, t.DueTime, autocompleteVal,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("insert next occurrence: %w", err)
@@ -108,13 +108,13 @@ func TaskScheduleNext(db *sql.DB, id int64) (*models.Task, error) {
 	_, err = tx.Exec(`
 		UPDATE tasks SET
 			recurring = 1,
-			recur_type = ?, recur_interval = ?, recur_time = ?,
+			recur_type = ?, recur_interval = ?,
 			recur_day_of_week = ?, recur_day_of_month = ?,
 			recur_starts = ?, recur_ends_type = ?,
 			recur_ends_date = ?, recur_ends_after = ?,
 			recur_count = ?
 		WHERE id = ?`,
-		t.RecurType, t.RecurInterval, t.RecurTime,
+		t.RecurType, t.RecurInterval,
 		t.RecurDayOfWeek, t.RecurDayOfMonth,
 		t.RecurStarts, t.RecurEndsType,
 		t.RecurEndsDate, t.RecurEndsAfter,

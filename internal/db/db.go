@@ -67,7 +67,6 @@ func migrate(db *sql.DB) error {
 		recurring          INTEGER NOT NULL DEFAULT 0,
 		recur_type         TEXT,          -- daily | weekly | monthly
 		recur_interval     INTEGER NOT NULL DEFAULT 1,
-		recur_time         TEXT,          -- HH:MM
 		recur_day_of_week  INTEGER,       -- 0-6
 		recur_day_of_month INTEGER,       -- 1-31
 		recur_starts       TEXT,          -- YYYY-MM-DD
@@ -93,6 +92,15 @@ func migrate(db *sql.DB) error {
 	if count == 0 {
 		if _, err := db.Exec(`ALTER TABLE tasks ADD COLUMN autocomplete INTEGER NOT NULL DEFAULT 0`); err != nil {
 			return fmt.Errorf("migrate autocomplete column: %w", err)
+		}
+	}
+
+	// Drop recur_time column if still present (removed in favour of inheriting due_time)
+	var rcCount int
+	db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('tasks') WHERE name='recur_time'`).Scan(&rcCount)
+	if rcCount > 0 {
+		if _, err := db.Exec(`ALTER TABLE tasks DROP COLUMN recur_time`); err != nil {
+			return fmt.Errorf("migrate drop column recur_time: %w", err)
 		}
 	}
 

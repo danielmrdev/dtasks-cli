@@ -579,10 +579,10 @@ func TestScheduler_InheritsFields(t *testing.T) {
 	d := openTestDB(t)
 	l, _ := repo.ListCreate(d, "Test")
 	due := "2026-02-26"
+	dueTime := "09:00"
 	notes := "important notes"
-	recurTime := "09:00"
-	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "With notes", DueDate: &due, Notes: &notes})
-	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "daily", Interval: 1, EndsType: "never", Time: &recurTime})
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "With notes", DueDate: &due, DueTime: &dueTime, Notes: &notes})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "daily", Interval: 1, EndsType: "never"})
 
 	next, err := repo.TaskScheduleNext(d, task.ID)
 	if err != nil {
@@ -594,8 +594,8 @@ func TestScheduler_InheritsFields(t *testing.T) {
 	if next.Notes == nil || *next.Notes != notes {
 		t.Errorf("expected Notes=%q, got %v", notes, next.Notes)
 	}
-	if next.DueTime == nil || *next.DueTime != recurTime {
-		t.Errorf("expected DueTime=%q, got %v", recurTime, next.DueTime)
+	if next.DueTime == nil || *next.DueTime != dueTime {
+		t.Errorf("expected DueTime=%q, got %v", dueTime, next.DueTime)
 	}
 }
 

@@ -182,8 +182,8 @@ func formatRecur(t *models.Task) string {
 		}
 	}
 
-	if t.RecurTime != nil {
-		fmt.Fprintf(&sb, " at %s", *t.RecurTime)
+	if t.DueTime != nil {
+		fmt.Fprintf(&sb, " at %s", *t.DueTime)
 	}
 
 	if t.RecurEndsType != nil {

@@ -133,23 +133,23 @@ dtasks rm 42
 ### Recurrence
 
 ```bash
-dtasks recur daily 42 --every 1 --time 09:00
-dtasks recur weekly 42 --every 2 --day thu --time 10:00 --ends-after 30
+dtasks recur daily 42 --every 1
+dtasks recur weekly 42 --every 2 --day thu --ends-after 30
 dtasks recur monthly 42 --every 1 --day 25 --ends never
 dtasks recur monthly 42 --every 3 --day 1 --ends 2027-01-01
 dtasks recur rm 42
 ```
 
-When you run `dtasks done` on a recurring task, the next occurrence is created automatically and printed. The new task inherits the title, notes, recurrence settings, and `--autocomplete` flag.
+When you run `dtasks done` on a recurring task, the next occurrence is created automatically and printed. The new task inherits the title, notes, `due_time`, recurrence settings, and `--autocomplete` flag.
 
 ### Autocomplete
 
 Tasks with `--autocomplete` are completed automatically the next time any dtasks command runs, once their `due_date` has passed. Useful for recurring reminders that don't need manual action:
 
 ```bash
-dtasks add --list 1 "Weekly review" --due 2026-03-07 --autocomplete
+dtasks add --list 1 "Weekly review" --due 2026-03-07 --due-time 09:00 --autocomplete
 dtasks recur weekly 42 --every 1 --day fri
-# Every Friday: the task auto-completes and a new one is created for next week
+# Every Friday: the task auto-completes and a new one is created for next week with the same time
 ```
 
 ### JSON output

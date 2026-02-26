@@ -89,14 +89,14 @@ dtasks rm <id>   # deletes task and its subtasks
 
 ## Recurrence
 
-Recurrence stores metadata on a task. When `dtasks done <id>` is run on a recurring task, the next occurrence is **created automatically** (title, notes, recurrence settings, and `autocomplete` are inherited; `due_date` is advanced by the configured interval).
+Recurrence stores metadata on a task. When `dtasks done <id>` is run on a recurring task, the next occurrence is **created automatically** (title, notes, `due_time`, recurrence settings, and `autocomplete` are inherited; `due_date` is advanced by the configured interval).
 
 ```bash
 # Daily — every N days
-dtasks recur daily <id> --every 1 --time 09:00
+dtasks recur daily <id> --every 1
 
 # Weekly — requires --day (mon tue wed thu fri sat sun)
-dtasks recur weekly <id> --every 2 --day thu --time 10:00
+dtasks recur weekly <id> --every 2 --day thu
 
 # Monthly — requires --day (1-31)
 dtasks recur monthly <id> --every 1 --day 25

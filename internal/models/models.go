@@ -22,7 +22,6 @@ type Task struct {
 	Recurring       bool       `json:"recurring"`
 	RecurType       *string    `json:"recur_type,omitempty"`
 	RecurInterval   int        `json:"recur_interval,omitempty"`
-	RecurTime       *string    `json:"recur_time,omitempty"`
 	RecurDayOfWeek  *int       `json:"recur_day_of_week,omitempty"`
 	RecurDayOfMonth *int       `json:"recur_day_of_month,omitempty"`
 	RecurStarts     *string    `json:"recur_starts,omitempty"`
