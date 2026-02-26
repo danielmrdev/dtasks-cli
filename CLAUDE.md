@@ -13,8 +13,14 @@ GOPROXY=https://goproxy.io,direct go mod tidy
 # Build for the current system
 go build ./...
 
-# Build all targets
+# Build for the current platform
+make build              # → dist/dtasks (native OS/arch)
+
+# Build all release targets
 make build-all          # macos-arm64, macos-amd64, linux-amd64, linux-arm64, windows-amd64.exe, windows-arm64.exe → dist/
+
+# Publish a release (creates git tag + pushes → triggers GH Actions)
+make release TAG=v1.2.3
 
 # Tests
 go test ./...

@@ -2,17 +2,31 @@ BINARY := dtasks
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 LDFLAGS := -s -w -X main.version=$(VERSION)
 
-.PHONY: all build-all \
+.PHONY: all build build-all \
 	build-mac-arm64 build-mac-amd64 \
 	build-linux-amd64 build-linux-arm64 \
 	build-windows-amd64 build-windows-arm64 \
-	clean tidy run install
+	release clean tidy run install
 
 all: build-all
 
 ## Install dependencies
 tidy:
 	go mod tidy
+
+## Build for the current platform (native)
+build:
+	CGO_ENABLED=0 go build -ldflags="$(LDFLAGS)" -o dist/$(BINARY) .
+	@echo "→ dist/$(BINARY)  ($(shell go env GOOS)/$(shell go env GOARCH))"
+
+## Tag and push to trigger the GitHub Actions release workflow.
+## Usage: make release TAG=v1.2.3
+release:
+	@[ -n "$(TAG)" ] || (echo "Usage: make release TAG=v1.2.3" && exit 1)
+	@echo "Tagging $(TAG)..."
+	git tag $(TAG)
+	git push origin $(TAG)
+	@echo "Release $(TAG) pushed — GitHub Actions will build and publish the binaries."
 
 ## Build all targets
 build-all: build-mac-arm64 build-mac-amd64 build-linux-amd64 build-linux-arm64 build-windows-amd64 build-windows-arm64
