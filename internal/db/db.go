@@ -1,0 +1,88 @@
+package db
+
+import (
+	"database/sql"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	_ "modernc.org/sqlite"
+)
+
+func Open(dbPath string) (*sql.DB, error) {
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
+		return nil, fmt.Errorf("cannot create db directory: %w", err)
+	}
+
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return nil, fmt.Errorf("cannot open database: %w", err)
+	}
+
+	// Single writer to avoid WAL conflicts; reads are concurrent
+	db.SetMaxOpenConns(1)
+
+	if err := configure(db); err != nil {
+		return nil, err
+	}
+	if err := migrate(db); err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
+
+func configure(db *sql.DB) error {
+	pragmas := []string{
+		"PRAGMA journal_mode=WAL",
+		"PRAGMA busy_timeout=5000",
+		"PRAGMA foreign_keys=ON",
+	}
+	for _, p := range pragmas {
+		if _, err := db.Exec(p); err != nil {
+			return fmt.Errorf("pragma %q failed: %w", p, err)
+		}
+	}
+	return nil
+}
+
+func migrate(db *sql.DB) error {
+	_, err := db.Exec(`
+	CREATE TABLE IF NOT EXISTS lists (
+		id         INTEGER PRIMARY KEY AUTOINCREMENT,
+		name       TEXT NOT NULL UNIQUE,
+		created_at DATETIME NOT NULL DEFAULT (datetime('now'))
+	);
+
+	CREATE TABLE IF NOT EXISTS tasks (
+		id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+		list_id            INTEGER NOT NULL REFERENCES lists(id) ON DELETE CASCADE,
+		parent_task_id     INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+		title              TEXT NOT NULL,
+		notes              TEXT,
+		date               TEXT,          -- YYYY-MM-DD
+		time               TEXT,          -- HH:MM (null = all-day)
+		due_date           TEXT,          -- YYYY-MM-DD
+		due_time           TEXT,          -- HH:MM (null = all-day)
+		completed          INTEGER NOT NULL DEFAULT 0,
+		completed_at       DATETIME,
+		recurring          INTEGER NOT NULL DEFAULT 0,
+		recur_type         TEXT,          -- daily | weekly | monthly
+		recur_interval     INTEGER NOT NULL DEFAULT 1,
+		recur_time         TEXT,          -- HH:MM
+		recur_day_of_week  INTEGER,       -- 0-6
+		recur_day_of_month INTEGER,       -- 1-31
+		recur_starts       TEXT,          -- YYYY-MM-DD
+		recur_ends_type    TEXT,          -- never | on_date | after_n
+		recur_ends_date    TEXT,          -- YYYY-MM-DD
+		recur_ends_after   INTEGER,
+		recur_count        INTEGER NOT NULL DEFAULT 0,
+		created_at         DATETIME NOT NULL DEFAULT (datetime('now'))
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_tasks_list    ON tasks(list_id);
+	CREATE INDEX IF NOT EXISTS idx_tasks_parent  ON tasks(parent_task_id);
+	CREATE INDEX IF NOT EXISTS idx_tasks_due     ON tasks(due_date);
+	`)
+	return err
+}
