@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/danielmrdev/dtasks-cli/internal/models"
+	"github.com/mattn/go-runewidth"
 )
 
 var JSONMode bool
@@ -61,7 +62,7 @@ func PrintTasks(tasks []models.Task) {
 		return
 	}
 
-	headers := []string{"ID", "LIST", "TITLE", "DUE", "DONE", "AC"}
+	headers := []string{"ID", "LIST", "TITLE", "DUE", "✔", "AC"}
 	var rows [][]string
 	for _, t := range tasks {
 		done := " "
@@ -209,7 +210,7 @@ func printBorderedTable(headers []string, plain [][]string, styled [][]string) {
 }
 
 func runeWidth(s string) int {
-	return len([]rune(s))
+	return runewidth.StringWidth(s)
 }
 
 func bold(s string) string {
