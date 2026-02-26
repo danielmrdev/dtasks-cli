@@ -30,35 +30,43 @@ func TestEnvFilePath_Linux(t *testing.T) {
 }
 
 func TestLoad_FromEnvFile(t *testing.T) {
-	// Create a temp dir to act as config dir
+	// Create a temp dir to act as home/config dir
 	dir, err := os.MkdirTemp("", "dtasks-config-test-*")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
 
-	envFile := filepath.Join(dir, ".env")
 	dbPath := filepath.Join(dir, "tasks.db")
 	content := "DB_PATH=" + dbPath + "\n"
-	if err := os.WriteFile(envFile, []byte(content), 0644); err != nil {
+
+	// Override HOME so EnvFilePath() resolves to our temp dir on macOS
+	// (darwin path: ~/.dtasks/.env → <dir>/.dtasks/.env)
+	oldHome := os.Getenv("HOME")
+	os.Setenv("HOME", dir)
+	defer os.Setenv("HOME", oldHome)
+
+	dotDtasksDir := filepath.Join(dir, ".dtasks")
+	if err := os.MkdirAll(dotDtasksDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dotDtasksDir, ".env"), []byte(content), 0644); err != nil {
 		t.Fatal(err)
 	}
 
-	// Override XDG_CONFIG_HOME so Load() reads our temp file
+	// Override XDG_CONFIG_HOME for Linux
+	// (linux path: $XDG_CONFIG_HOME/dtasks/.env → <dir>/dtasks/.env)
 	oldXDG := os.Getenv("XDG_CONFIG_HOME")
-	// EnvFilePath() on Linux: $XDG_CONFIG_HOME/dtasks/.env
-	// We need to place our .env at the right relative location.
-	// Create dtasks subdir inside our temp config dir.
-	dtasksDir := filepath.Join(dir, "dtasks")
-	if err := os.MkdirAll(dtasksDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	envFile2 := filepath.Join(dtasksDir, ".env")
-	if err := os.WriteFile(envFile2, []byte(content), 0644); err != nil {
-		t.Fatal(err)
-	}
 	os.Setenv("XDG_CONFIG_HOME", dir)
 	defer os.Setenv("XDG_CONFIG_HOME", oldXDG)
+
+	xdgDtasksDir := filepath.Join(dir, "dtasks")
+	if err := os.MkdirAll(xdgDtasksDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(xdgDtasksDir, ".env"), []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	cfg, err := config.Load()
 	if err != nil {

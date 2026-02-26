@@ -12,13 +12,12 @@ import (
 // --- add ---
 
 var (
-	addListID  int64
-	addParent  int64
-	addNotes   string
-	addDate    string
-	addTime    string
-	addDueDate string
-	addDueTime string
+	addListID       int64
+	addParent       int64
+	addNotes        string
+	addDueDate      string
+	addDueTime      string
+	addAutocomplete bool
 )
 
 var addCmd = &cobra.Command{
@@ -26,6 +25,9 @@ var addCmd = &cobra.Command{
 	Short: "Add a new task",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if cmd.Flags().Changed("due-time") && !cmd.Flags().Changed("due") {
+			return fmt.Errorf("--due-time requires --due")
+		}
 		in := repo.TaskInput{
 			ListID: addListID,
 			Title:  args[0],
@@ -36,17 +38,14 @@ var addCmd = &cobra.Command{
 		if cmd.Flags().Changed("notes") {
 			in.Notes = &addNotes
 		}
-		if cmd.Flags().Changed("date") {
-			in.Date = &addDate
-		}
-		if cmd.Flags().Changed("time") {
-			in.Time = &addTime
-		}
 		if cmd.Flags().Changed("due") {
 			in.DueDate = &addDueDate
 		}
 		if cmd.Flags().Changed("due-time") {
 			in.DueTime = &addDueTime
+		}
+		if cmd.Flags().Changed("autocomplete") {
+			in.Autocomplete = addAutocomplete
 		}
 
 		t, err := repo.TaskCreate(DB, in)
@@ -63,10 +62,9 @@ func init() {
 	addCmd.MarkFlagRequired("list")
 	addCmd.Flags().Int64Var(&addParent, "parent", 0, "Parent task ID (for subtasks)")
 	addCmd.Flags().StringVarP(&addNotes, "notes", "n", "", "Notes")
-	addCmd.Flags().StringVar(&addDate, "date", "", "Scheduled date (YYYY-MM-DD)")
-	addCmd.Flags().StringVar(&addTime, "time", "", "Scheduled time (HH:MM)")
 	addCmd.Flags().StringVar(&addDueDate, "due", "", "Due date (YYYY-MM-DD)")
-	addCmd.Flags().StringVar(&addDueTime, "due-time", "", "Due time (HH:MM)")
+	addCmd.Flags().StringVar(&addDueTime, "due-time", "", "Due time (HH:MM, requires --due)")
+	addCmd.Flags().BoolVar(&addAutocomplete, "autocomplete", false, "Auto-complete when due date passes")
 }
 
 // --- ls ---
@@ -80,6 +78,7 @@ var (
 var lsCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "List tasks",
+	Long:  "List tasks.\n\nColumn symbols:\n  DONE  ✓ = completed\n  AC    ✓ = auto-complete on due date",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		opts := repo.TaskListOptions{OnlyRoot: true}
 
@@ -142,13 +141,12 @@ var showCmd = &cobra.Command{
 // --- edit ---
 
 var (
-	editTitle   string
-	editNotes   string
-	editDate    string
-	editTime    string
-	editDueDate string
-	editDueTime string
-	editListID  int64
+	editTitle        string
+	editNotes        string
+	editDueDate      string
+	editDueTime      string
+	editListID       int64
+	editAutocomplete bool
 )
 
 var editCmd = &cobra.Command{
@@ -156,6 +154,9 @@ var editCmd = &cobra.Command{
 	Short: "Edit a task",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if cmd.Flags().Changed("due-time") && !cmd.Flags().Changed("due") {
+			return fmt.Errorf("--due-time requires --due")
+		}
 		id, err := parseID(args[0])
 		if err != nil {
 			return err
@@ -168,12 +169,6 @@ var editCmd = &cobra.Command{
 		if cmd.Flags().Changed("notes") {
 			p.Notes = &editNotes
 		}
-		if cmd.Flags().Changed("date") {
-			p.Date = &editDate
-		}
-		if cmd.Flags().Changed("time") {
-			p.Time = &editTime
-		}
 		if cmd.Flags().Changed("due") {
 			p.DueDate = &editDueDate
 		}
@@ -182,6 +177,9 @@ var editCmd = &cobra.Command{
 		}
 		if cmd.Flags().Changed("list") {
 			p.ListID = &editListID
+		}
+		if cmd.Flags().Changed("autocomplete") {
+			p.Autocomplete = &editAutocomplete
 		}
 
 		t, err := repo.TaskPatchFields(DB, id, p)
@@ -196,11 +194,10 @@ var editCmd = &cobra.Command{
 func init() {
 	editCmd.Flags().StringVar(&editTitle, "title", "", "New title")
 	editCmd.Flags().StringVarP(&editNotes, "notes", "n", "", "New notes")
-	editCmd.Flags().StringVar(&editDate, "date", "", "Scheduled date (YYYY-MM-DD)")
-	editCmd.Flags().StringVar(&editTime, "time", "", "Scheduled time (HH:MM)")
 	editCmd.Flags().StringVar(&editDueDate, "due", "", "Due date (YYYY-MM-DD)")
-	editCmd.Flags().StringVar(&editDueTime, "due-time", "", "Due time (HH:MM)")
+	editCmd.Flags().StringVar(&editDueTime, "due-time", "", "Due time (HH:MM, requires --due)")
 	editCmd.Flags().Int64VarP(&editListID, "list", "l", 0, "Move to list ID")
+	editCmd.Flags().BoolVar(&editAutocomplete, "autocomplete", false, "Enable/disable autocomplete")
 }
 
 // --- done / undone ---
@@ -218,6 +215,15 @@ var doneCmd = &cobra.Command{
 			return err
 		}
 		output.PrintSuccess(fmt.Sprintf("Task #%d marked as done ✓", id))
+
+		next, err := repo.TaskScheduleNext(DB, id)
+		if err != nil {
+			return err
+		}
+		if next != nil {
+			fmt.Println("\nNext occurrence scheduled:")
+			output.PrintTask(next)
+		}
 		return nil
 	},
 }

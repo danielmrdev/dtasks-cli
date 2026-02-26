@@ -51,7 +51,7 @@ func migrate(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS lists (
 		id         INTEGER PRIMARY KEY AUTOINCREMENT,
 		name       TEXT NOT NULL UNIQUE,
-		created_at DATETIME NOT NULL DEFAULT (datetime('now'))
+		created_at DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
 	);
 
 	CREATE TABLE IF NOT EXISTS tasks (
@@ -60,8 +60,6 @@ func migrate(db *sql.DB) error {
 		parent_task_id     INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
 		title              TEXT NOT NULL,
 		notes              TEXT,
-		date               TEXT,          -- YYYY-MM-DD
-		time               TEXT,          -- HH:MM (null = all-day)
 		due_date           TEXT,          -- YYYY-MM-DD
 		due_time           TEXT,          -- HH:MM (null = all-day)
 		completed          INTEGER NOT NULL DEFAULT 0,
@@ -69,7 +67,6 @@ func migrate(db *sql.DB) error {
 		recurring          INTEGER NOT NULL DEFAULT 0,
 		recur_type         TEXT,          -- daily | weekly | monthly
 		recur_interval     INTEGER NOT NULL DEFAULT 1,
-		recur_time         TEXT,          -- HH:MM
 		recur_day_of_week  INTEGER,       -- 0-6
 		recur_day_of_month INTEGER,       -- 1-31
 		recur_starts       TEXT,          -- YYYY-MM-DD
@@ -77,12 +74,45 @@ func migrate(db *sql.DB) error {
 		recur_ends_date    TEXT,          -- YYYY-MM-DD
 		recur_ends_after   INTEGER,
 		recur_count        INTEGER NOT NULL DEFAULT 0,
-		created_at         DATETIME NOT NULL DEFAULT (datetime('now'))
+		autocomplete       INTEGER NOT NULL DEFAULT 0,
+		created_at         DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
 	);
 
 	CREATE INDEX IF NOT EXISTS idx_tasks_list    ON tasks(list_id);
 	CREATE INDEX IF NOT EXISTS idx_tasks_parent  ON tasks(parent_task_id);
 	CREATE INDEX IF NOT EXISTS idx_tasks_due     ON tasks(due_date);
 	`)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Add autocomplete column if missing (existing DBs)
+	var count int
+	db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('tasks') WHERE name='autocomplete'`).Scan(&count)
+	if count == 0 {
+		if _, err := db.Exec(`ALTER TABLE tasks ADD COLUMN autocomplete INTEGER NOT NULL DEFAULT 0`); err != nil {
+			return fmt.Errorf("migrate autocomplete column: %w", err)
+		}
+	}
+
+	// Drop recur_time column if still present (removed in favour of inheriting due_time)
+	var rcCount int
+	db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('tasks') WHERE name='recur_time'`).Scan(&rcCount)
+	if rcCount > 0 {
+		if _, err := db.Exec(`ALTER TABLE tasks DROP COLUMN recur_time`); err != nil {
+			return fmt.Errorf("migrate drop column recur_time: %w", err)
+		}
+	}
+
+	// Drop legacy date/time columns if still present
+	for _, col := range []string{"date", "time"} {
+		var n int
+		db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('tasks') WHERE name=?`, col).Scan(&n)
+		if n > 0 {
+			if _, err := db.Exec(`ALTER TABLE tasks DROP COLUMN ` + col); err != nil {
+				return fmt.Errorf("migrate drop column %s: %w", col, err)
+			}
+		}
+	}
+	return nil
 }

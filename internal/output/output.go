@@ -51,17 +51,20 @@ func PrintTasks(tasks []models.Task) {
 		return
 	}
 	w := newTabWriter()
-	fmt.Fprintln(w, "ID\tLIST\tTITLE\tDATE\tDUE\tDONE")
+	fmt.Fprintln(w, "ID\tLIST\tTITLE\tDUE\tDONE\tAC")
 	for _, t := range tasks {
 		done := " "
 		if t.Completed {
 			done = "✓"
 		}
+		ac := " "
+		if t.Autocomplete {
+			ac = "✓"
+		}
 		fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\n",
 			t.ID, t.ListName, t.Title,
-			formatDate(t.Date, t.Time),
 			formatDate(t.DueDate, t.DueTime),
-			done,
+			done, ac,
 		)
 	}
 	w.Flush()
@@ -73,33 +76,33 @@ func PrintTask(t *models.Task) {
 		return
 	}
 	fmt.Printf("Task #%d\n", t.ID)
-	fmt.Printf("  Title    : %s\n", t.Title)
-	fmt.Printf("  List     : %s (#%d)\n", t.ListName, t.ListID)
+	fmt.Printf("  Title       : %s\n", t.Title)
+	fmt.Printf("  List        : %s (#%d)\n", t.ListName, t.ListID)
 	if t.ParentTaskID != nil {
-		fmt.Printf("  Parent   : #%d\n", *t.ParentTaskID)
+		fmt.Printf("  Parent      : #%d\n", *t.ParentTaskID)
 	}
 	if t.Notes != nil && *t.Notes != "" {
-		fmt.Printf("  Notes    : %s\n", *t.Notes)
-	}
-	if t.Date != nil {
-		fmt.Printf("  Date     : %s\n", formatDate(t.Date, t.Time))
+		fmt.Printf("  Notes       : %s\n", *t.Notes)
 	}
 	if t.DueDate != nil {
-		fmt.Printf("  Due      : %s\n", formatDate(t.DueDate, t.DueTime))
+		fmt.Printf("  Due         : %s\n", formatDate(t.DueDate, t.DueTime))
 	}
 	if t.Completed {
 		comp := ""
 		if t.CompletedAt != nil {
 			comp = " on " + t.CompletedAt.Format("2006-01-02 15:04")
 		}
-		fmt.Printf("  Status   : ✓ completed%s\n", comp)
+		fmt.Printf("  Status      : ✓ completed%s\n", comp)
 	} else {
-		fmt.Printf("  Status   : pending\n")
+		fmt.Printf("  Status      : pending\n")
+	}
+	if t.Autocomplete {
+		fmt.Printf("  Autocomplete: ✓\n")
 	}
 	if t.Recurring {
-		fmt.Printf("  Recur    : %s\n", formatRecur(t))
+		fmt.Printf("  Recurring   : %s\n", formatRecur(t))
 	}
-	fmt.Printf("  Created  : %s\n", t.CreatedAt.Format("2006-01-02"))
+	fmt.Printf("  Created     : %s\n", t.CreatedAt.Format("2006-01-02"))
 }
 
 func PrintSuccess(msg string) {
@@ -179,8 +182,8 @@ func formatRecur(t *models.Task) string {
 		}
 	}
 
-	if t.RecurTime != nil {
-		fmt.Fprintf(&sb, " at %s", *t.RecurTime)
+	if t.DueTime != nil {
+		fmt.Fprintf(&sb, " at %s", *t.DueTime)
 	}
 
 	if t.RecurEndsType != nil {

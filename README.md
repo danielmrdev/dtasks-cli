@@ -61,7 +61,10 @@ go build -o dtasks .
 Build all release targets at once:
 
 ```bash
-make build-all   # outputs to dist/
+make build        # native binary → dist/dtasks
+make install      # build + copy to ~/.local/bin
+make build-all    # all platforms → dist/
+make help         # list all targets
 ```
 
 ## First run
@@ -107,6 +110,7 @@ dtasks list rm 1
 dtasks add --list 1 "Buy milk"
 dtasks add --list 1 "Buy milk" --due 2026-03-01 --due-time 10:00 --notes "organic"
 dtasks add --list 1 --parent 5 "Subtask title"
+dtasks add --list 1 "Weekly review" --due 2026-03-07 --autocomplete   # auto-completes when due
 
 # Read
 dtasks ls                    # pending tasks
@@ -117,8 +121,9 @@ dtasks show 42               # full detail + subtasks
 
 # Update
 dtasks edit 42 --title "New title"
-dtasks edit 42 --due 2026-04-01 --notes "updated"
-dtasks done 42
+dtasks edit 42 --due 2026-04-01 --due-time 17:00 --notes "updated"
+dtasks edit 42 --autocomplete          # toggle autocomplete on an existing task
+dtasks done 42                         # marks done; if recurring, schedules next occurrence
 dtasks undone 42
 
 # Delete
@@ -128,11 +133,23 @@ dtasks rm 42
 ### Recurrence
 
 ```bash
-dtasks recur daily 42 --every 1 --time 09:00
-dtasks recur weekly 42 --every 2 --day thu --time 10:00 --ends-after 30
+dtasks recur daily 42 --every 1
+dtasks recur weekly 42 --every 2 --day thu --ends-after 30
 dtasks recur monthly 42 --every 1 --day 25 --ends never
 dtasks recur monthly 42 --every 3 --day 1 --ends 2027-01-01
 dtasks recur rm 42
+```
+
+When you run `dtasks done` on a recurring task, the next occurrence is created automatically and printed. The new task inherits the title, notes, `due_time`, recurrence settings, and `--autocomplete` flag.
+
+### Autocomplete
+
+Tasks with `--autocomplete` are completed automatically the next time any dtasks command runs, once their `due_date` has passed. Useful for recurring reminders that don't need manual action:
+
+```bash
+dtasks add --list 1 "Weekly review" --due 2026-03-07 --due-time 09:00 --autocomplete
+dtasks recur weekly 42 --every 1 --day fri
+# Every Friday: the task auto-completes and a new one is created for next week with the same time
 ```
 
 ### JSON output

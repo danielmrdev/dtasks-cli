@@ -12,6 +12,17 @@ go build ./...
 go test ./...
 ```
 
+Common `make` targets:
+
+| Command | Description |
+|---|---|
+| `make build` | Build native binary → `dist/dtasks` |
+| `make install` | Build and copy to `~/.local/bin/dtasks` |
+| `make build-all` | Build all release targets → `dist/` |
+| `make run ARGS="ls"` | Run without installing |
+| `make release TAG=v1.2.3` | Tag and push to trigger the release workflow |
+| `make help` | List all available targets |
+
 ## Workflow
 
 1. [Open an issue](https://github.com/danielmrdev/dtasks-cli/issues) before starting non-trivial work so we can discuss the approach.

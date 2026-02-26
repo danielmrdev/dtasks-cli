@@ -16,7 +16,6 @@ var recurCmd = &cobra.Command{
 
 var (
 	recurEvery  int
-	recurTime   string
 	recurDay    string // for weekly: mon,tue,wed,thu,fri,sat,sun
 	recurDayNum int    // for monthly: 1-31
 	recurStarts string
@@ -38,9 +37,6 @@ var recurDailyCmd = &cobra.Command{
 			Type:     "daily",
 			Interval: recurEvery,
 			EndsType: resolveEndsType(cmd),
-		}
-		if cmd.Flags().Changed("time") {
-			r.Time = &recurTime
 		}
 		if cmd.Flags().Changed("starts") {
 			r.Starts = &recurStarts
@@ -78,9 +74,6 @@ var recurWeeklyCmd = &cobra.Command{
 			DayOfWeek: &dow,
 			EndsType:  resolveEndsType(cmd),
 		}
-		if cmd.Flags().Changed("time") {
-			r.Time = &recurTime
-		}
 		if cmd.Flags().Changed("starts") {
 			r.Starts = &recurStarts
 		}
@@ -116,9 +109,6 @@ var recurMonthlyCmd = &cobra.Command{
 			DayOfMonth: &recurDayNum,
 			EndsType:   resolveEndsType(cmd),
 		}
-		if cmd.Flags().Changed("time") {
-			r.Time = &recurTime
-		}
 		if cmd.Flags().Changed("starts") {
 			r.Starts = &recurStarts
 		}
@@ -152,7 +142,6 @@ var recurRmCmd = &cobra.Command{
 func init() {
 	for _, c := range []*cobra.Command{recurDailyCmd, recurWeeklyCmd, recurMonthlyCmd} {
 		c.Flags().IntVar(&recurEvery, "every", 1, "Interval (e.g. every 3 days/weeks/months)")
-		c.Flags().StringVar(&recurTime, "time", "", "Time of occurrence (HH:MM)")
 		c.Flags().StringVar(&recurStarts, "starts", "", "Start date (YYYY-MM-DD)")
 		c.Flags().StringVar(&recurEnds, "ends", "", "End date (YYYY-MM-DD) or \"never\"")
 		c.Flags().IntVar(&recurAfter, "ends-after", 0, "End after N repetitions")
