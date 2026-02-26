@@ -124,6 +124,11 @@ func TaskScheduleNext(db *sql.DB, id int64) (*models.Task, error) {
 		return nil, fmt.Errorf("set recur on next occurrence: %w", err)
 	}
 
+	// Reflect the spawned count back on the original task so its display is accurate.
+	if _, err = tx.Exec(`UPDATE tasks SET recur_count = ? WHERE id = ?`, newCount, id); err != nil {
+		return nil, fmt.Errorf("update recur_count on original task: %w", err)
+	}
+
 	if err := tx.Commit(); err != nil {
 		return nil, fmt.Errorf("commit: %w", err)
 	}

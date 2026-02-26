@@ -697,6 +697,35 @@ func TestAutocomplete_RecurringChain(t *testing.T) {
 	}
 }
 
+func TestRecurCount_UpdatedOnOriginalAfterSpawn(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	yesterday := "2026-02-25"
+	endsAfter := 2
+	task, _ := repo.TaskCreate(d, repo.TaskInput{
+		ListID:  l.ID,
+		Title:   "Counter test",
+		DueDate: &yesterday,
+	})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "daily", Interval: 1, EndsType: "after_n", EndsAfter: &endsAfter})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next == nil {
+		t.Fatal("expected a next occurrence to be created")
+	}
+
+	original, _ := repo.TaskGet(d, task.ID)
+	if original.RecurCount != 1 {
+		t.Errorf("expected original recur_count = 1, got %d", original.RecurCount)
+	}
+	if next.RecurCount != 1 {
+		t.Errorf("expected next recur_count = 1, got %d", next.RecurCount)
+	}
+}
+
 func TestAutocomplete_NonAutocomplete(t *testing.T) {
 	d := openTestDB(t)
 	l, _ := repo.ListCreate(d, "Test")
