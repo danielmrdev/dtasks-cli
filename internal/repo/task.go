@@ -14,18 +14,17 @@ type TaskInput struct {
 	ParentTaskID *int64
 	Title        string
 	Notes        *string
-	Date         *string
-	Time         *string
 	DueDate      *string
 	DueTime      *string
+	Autocomplete bool
 }
 
 func TaskCreate(db *sql.DB, in TaskInput) (*models.Task, error) {
 	res, err := db.Exec(`
-		INSERT INTO tasks (list_id, parent_task_id, title, notes, date, time, due_date, due_time)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		INSERT INTO tasks (list_id, parent_task_id, title, notes, due_date, due_time, autocomplete)
+		VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		in.ListID, in.ParentTaskID, in.Title, in.Notes,
-		in.Date, in.Time, in.DueDate, in.DueTime,
+		in.DueDate, in.DueTime, boolToInt(in.Autocomplete),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("create task: %w", err)
@@ -100,10 +99,10 @@ func TaskUpdate(db *sql.DB, id int64, in TaskInput) (*models.Task, error) {
 	res, err := db.Exec(`
 		UPDATE tasks SET
 			list_id = ?, parent_task_id = ?, title = ?, notes = ?,
-			date = ?, time = ?, due_date = ?, due_time = ?
+			due_date = ?, due_time = ?
 		WHERE id = ?`,
 		in.ListID, in.ParentTaskID, in.Title, in.Notes,
-		in.Date, in.Time, in.DueDate, in.DueTime,
+		in.DueDate, in.DueTime,
 		id,
 	)
 	if err != nil {
@@ -118,13 +117,12 @@ func TaskUpdate(db *sql.DB, id int64, in TaskInput) (*models.Task, error) {
 
 // TaskPatch updates only non-nil fields.
 type TaskPatch struct {
-	Title   *string
-	Notes   *string
-	Date    *string
-	Time    *string
-	DueDate *string
-	DueTime *string
-	ListID  *int64
+	Title        *string
+	Notes        *string
+	DueDate      *string
+	DueTime      *string
+	ListID       *int64
+	Autocomplete *bool
 }
 
 func TaskPatchFields(db *sql.DB, id int64, p TaskPatch) (*models.Task, error) {
@@ -145,12 +143,6 @@ func TaskPatchFields(db *sql.DB, id int64, p TaskPatch) (*models.Task, error) {
 	if p.Notes != nil {
 		add("notes", *p.Notes)
 	}
-	if p.Date != nil {
-		add("date", *p.Date)
-	}
-	if p.Time != nil {
-		add("time", *p.Time)
-	}
 	if p.DueDate != nil {
 		add("due_date", *p.DueDate)
 	}
@@ -159,6 +151,9 @@ func TaskPatchFields(db *sql.DB, id int64, p TaskPatch) (*models.Task, error) {
 	}
 	if p.ListID != nil {
 		add("list_id", *p.ListID)
+	}
+	if p.Autocomplete != nil {
+		add("autocomplete", boolToInt(*p.Autocomplete))
 	}
 
 	if set == "" {
@@ -211,9 +206,14 @@ type RecurInput struct {
 	EndsType   string // never | on_date | after_n
 	EndsDate   *string
 	EndsAfter  *int
+	Count      *int // nil → reset to 0; non-nil → explicit value
 }
 
 func TaskSetRecur(db *sql.DB, id int64, r RecurInput) error {
+	count := 0
+	if r.Count != nil {
+		count = *r.Count
+	}
 	_, err := db.Exec(`
 		UPDATE tasks SET
 			recurring = 1,
@@ -221,13 +221,13 @@ func TaskSetRecur(db *sql.DB, id int64, r RecurInput) error {
 			recur_day_of_week = ?, recur_day_of_month = ?,
 			recur_starts = ?, recur_ends_type = ?,
 			recur_ends_date = ?, recur_ends_after = ?,
-			recur_count = 0
+			recur_count = ?
 		WHERE id = ?`,
 		r.Type, r.Interval, r.Time,
 		r.DayOfWeek, r.DayOfMonth,
 		r.Starts, r.EndsType,
 		r.EndsDate, r.EndsAfter,
-		id,
+		count, id,
 	)
 	return err
 }
@@ -245,16 +245,23 @@ func TaskRemoveRecur(db *sql.DB, id int64) error {
 
 // --- Helpers ---
 
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
 const taskSelectSQL = `
 SELECT
 	t.id, t.list_id, l.name,
 	t.parent_task_id, t.title, t.notes,
-	t.date, t.time, t.due_date, t.due_time,
+	t.due_date, t.due_time,
 	t.completed, t.completed_at,
 	t.recurring, t.recur_type, t.recur_interval, t.recur_time,
 	t.recur_day_of_week, t.recur_day_of_month,
 	t.recur_starts, t.recur_ends_type, t.recur_ends_date, t.recur_ends_after,
-	t.recur_count, t.created_at
+	t.recur_count, t.autocomplete, t.created_at
 FROM tasks t
 JOIN lists l ON t.list_id = l.id
 `
@@ -273,12 +280,12 @@ func scanTaskRow(s scanner) (*models.Task, error) {
 	err := s.Scan(
 		&t.ID, &t.ListID, &t.ListName,
 		&t.ParentTaskID, &t.Title, &t.Notes,
-		&t.Date, &t.Time, &t.DueDate, &t.DueTime,
+		&t.DueDate, &t.DueTime,
 		&t.Completed, &completedAt,
 		&t.Recurring, &t.RecurType, &t.RecurInterval, &t.RecurTime,
 		&t.RecurDayOfWeek, &t.RecurDayOfMonth,
 		&t.RecurStarts, &t.RecurEndsType, &t.RecurEndsDate, &t.RecurEndsAfter,
-		&t.RecurCount, &t.CreatedAt,
+		&t.RecurCount, &t.Autocomplete, &t.CreatedAt,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("scan task: %w", err)

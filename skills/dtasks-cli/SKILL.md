@@ -44,16 +44,16 @@ dtasks list rm <id>                # delete list AND all its tasks (irreversible
 ```bash
 dtasks add --list <list-id> "<title>"
 dtasks add --list <list-id> "<title>" \
-  --due 2026-03-01 \
-  --due-time 10:00 \
+  --due 2026-03-01 --due-time 17:00 \
   --notes "any free text" \
-  --date 2026-02-28 \       # scheduled date (different from due date)
-  --time 09:00              # scheduled time
+  --autocomplete
 ```
 
 - `--list` / `-l` is **required**.
 - `--parent <task-id>` creates a subtask under the given task.
-- Dates: `YYYY-MM-DD`. Times: `HH:MM`. Both are optional.
+- `--due` — due date (`YYYY-MM-DD`). Drives `--due-today` filtering, autocomplete, recurrence base date, and sort order.
+- `--due-time` — due time (`HH:MM`). **Requires `--due`** — error if used alone.
+- `--autocomplete` — the task is automatically marked done the next time any dtasks command runs after its `due_date` has passed. If recurring, the next occurrence is created at that point.
 
 ### Read
 
@@ -69,14 +69,15 @@ dtasks show <id>             # full detail + subtasks
 
 ```bash
 dtasks edit <id> --title "<new title>"
-dtasks edit <id> --due 2026-04-01
+dtasks edit <id> --due 2026-04-01 --due-time 17:00
 dtasks edit <id> --notes "updated notes"
 dtasks edit <id> --list <new-list-id>   # move to another list
-dtasks done <id>
+dtasks edit <id> --autocomplete         # enable/disable autocomplete
+dtasks done <id>    # marks done; if recurring, prints the next scheduled occurrence
 dtasks undone <id>
 ```
 
-Only pass the flags you want to change — omitted flags are left untouched.
+Only pass the flags you want to change — omitted flags are left untouched. `--due-time` requires `--due`.
 
 ### Delete
 
@@ -88,8 +89,7 @@ dtasks rm <id>   # deletes task and its subtasks
 
 ## Recurrence
 
-Recurrence stores metadata on a task; it does **not** auto-create future
-occurrences (out of scope for v1).
+Recurrence stores metadata on a task. When `dtasks done <id>` is run on a recurring task, the next occurrence is **created automatically** (title, notes, recurrence settings, and `autocomplete` are inherited; `due_date` is advanced by the configured interval).
 
 ```bash
 # Daily — every N days
@@ -110,8 +110,10 @@ dtasks recur rm <id>
 
 End conditions (mutually exclusive):
 - `--ends never` (default)
-- `--ends YYYY-MM-DD`
+- `--ends YYYY-MM-DD` — no more occurrences after this date
 - `--ends-after <n>` — stop after N repetitions
+
+**Month overflow clamping:** if `due_date` is Jan 31 and recurrence is monthly, the next date is Feb 28 (last valid day of the month).
 
 ---
 
@@ -134,7 +136,7 @@ dtasks edit "$id" --due 2026-03-01
 
 JSON shapes:
 - List: `{"id": 1, "name": "Work", "created_at": "..."}`
-- Task: `{"id": 42, "list_id": 1, "title": "...", "notes": "...", "date": "...", "time": "...", "due_date": "...", "due_time": "...", "completed": false, "parent_task_id": null, "created_at": "...", "updated_at": "..."}`
+- Task: `{"id": 42, "list_id": 1, "title": "...", "notes": "...", "due_date": "...", "due_time": "...", "completed": false, "autocomplete": false, "parent_task_id": null, "created_at": "..."}`
 
 ---
 
@@ -170,6 +172,7 @@ dtasks ls --list "$from" --all --json | jq '.[].id' | xargs -I{} dtasks edit {} 
 - `--due-today` includes tasks where `due_date <= today` (overdue tasks show up).
 - `ls` without `--all` hides completed tasks.
 - `ls` only returns root tasks (no subtasks); use `show <id>` to see subtasks.
-- Recurrence is stored but does **not** trigger automatic task creation.
-- Dates must be `YYYY-MM-DD`; any other format will be rejected by the DB layer.
-- Times must be `HH:MM` (24-hour).
+- `done` on a recurring task creates the next occurrence automatically; prints it inline.
+- `autocomplete` tasks are silently completed on the next command invocation after their due date passes.
+- `--due-time` without `--due` is an error.
+- Dates must be `YYYY-MM-DD`; times must be `HH:MM` (24-hour).

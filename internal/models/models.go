@@ -15,8 +15,6 @@ type Task struct {
 	ParentTaskID    *int64
 	Title           string
 	Notes           *string
-	Date            *string // YYYY-MM-DD
-	Time            *string // HH:MM
 	DueDate         *string // YYYY-MM-DD
 	DueTime         *string // HH:MM
 	Completed       bool
@@ -32,5 +30,6 @@ type Task struct {
 	RecurEndsDate   *string // YYYY-MM-DD
 	RecurEndsAfter  *int
 	RecurCount      int
+	Autocomplete    bool
 	CreatedAt       time.Time
 }

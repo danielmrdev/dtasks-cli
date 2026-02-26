@@ -51,15 +51,14 @@ func PrintTasks(tasks []models.Task) {
 		return
 	}
 	w := newTabWriter()
-	fmt.Fprintln(w, "ID\tLIST\tTITLE\tDATE\tDUE\tDONE")
+	fmt.Fprintln(w, "ID\tLIST\tTITLE\tDUE\tDONE")
 	for _, t := range tasks {
 		done := " "
 		if t.Completed {
 			done = "✓"
 		}
-		fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\n",
+		fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\n",
 			t.ID, t.ListName, t.Title,
-			formatDate(t.Date, t.Time),
 			formatDate(t.DueDate, t.DueTime),
 			done,
 		)
@@ -80,9 +79,6 @@ func PrintTask(t *models.Task) {
 	}
 	if t.Notes != nil && *t.Notes != "" {
 		fmt.Printf("  Notes    : %s\n", *t.Notes)
-	}
-	if t.Date != nil {
-		fmt.Printf("  Date     : %s\n", formatDate(t.Date, t.Time))
 	}
 	if t.DueDate != nil {
 		fmt.Printf("  Due      : %s\n", formatDate(t.DueDate, t.DueTime))

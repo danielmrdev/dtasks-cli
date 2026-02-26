@@ -397,3 +397,322 @@ func TestListDelete_CascadesTasks(t *testing.T) {
 		t.Errorf("expected 0 tasks after list deletion, got %d", len(tasks))
 	}
 }
+
+// --- Scheduler tests ---
+
+func TestScheduler_Daily(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	due := "2026-02-26"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Daily task", DueDate: &due})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "daily", Interval: 1, EndsType: "never"})
+	repo.TaskDone(d, task.ID, true)
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next == nil {
+		t.Fatal("expected next occurrence, got nil")
+	}
+	if next.DueDate == nil || *next.DueDate != "2026-02-27" {
+		t.Errorf("expected DueDate=2026-02-27, got %v", next.DueDate)
+	}
+}
+
+func TestScheduler_Weekly(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	due := "2026-02-26"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Weekly task", DueDate: &due})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "weekly", Interval: 2, EndsType: "never"})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next == nil {
+		t.Fatal("expected next occurrence, got nil")
+	}
+	if next.DueDate == nil || *next.DueDate != "2026-03-12" {
+		t.Errorf("expected DueDate=2026-03-12, got %v", next.DueDate)
+	}
+}
+
+func TestScheduler_Monthly(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	due := "2026-01-15"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Monthly task", DueDate: &due})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "monthly", Interval: 1, EndsType: "never"})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next == nil {
+		t.Fatal("expected next occurrence, got nil")
+	}
+	if next.DueDate == nil || *next.DueDate != "2026-02-15" {
+		t.Errorf("expected DueDate=2026-02-15, got %v", next.DueDate)
+	}
+}
+
+func TestScheduler_Monthly_DayClamp(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	due := "2026-01-31"
+	day := 31
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "End of month", DueDate: &due})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{
+		Type: "monthly", Interval: 1, EndsType: "never", DayOfMonth: &day,
+	})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next == nil {
+		t.Fatal("expected next occurrence, got nil")
+	}
+	if next.DueDate == nil || *next.DueDate != "2026-02-28" {
+		t.Errorf("expected DueDate=2026-02-28, got %v", next.DueDate)
+	}
+}
+
+func TestScheduler_EndsAfterN_Creates(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	due := "2026-02-26"
+	endsAfter := 3
+	count := 2
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Limited", DueDate: &due})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{
+		Type: "daily", Interval: 1, EndsType: "after_n", EndsAfter: &endsAfter, Count: &count,
+	})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next == nil {
+		t.Fatal("expected next occurrence when count < endsAfter")
+	}
+	if next.RecurCount != 3 {
+		t.Errorf("expected RecurCount=3, got %d", next.RecurCount)
+	}
+}
+
+func TestScheduler_EndsAfterN_Stops(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	due := "2026-02-26"
+	endsAfter := 3
+	count := 3
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Done", DueDate: &due})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{
+		Type: "daily", Interval: 1, EndsType: "after_n", EndsAfter: &endsAfter, Count: &count,
+	})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next != nil {
+		t.Errorf("expected nil when count >= endsAfter, got task %d", next.ID)
+	}
+}
+
+func TestScheduler_EndsOnDate_Creates(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	due := "2026-03-05"
+	endsDate := "2026-03-15"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "On date", DueDate: &due})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{
+		Type: "daily", Interval: 5, EndsType: "on_date", EndsDate: &endsDate,
+	})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next == nil {
+		t.Fatal("expected next occurrence when nextDate <= endsDate")
+	}
+}
+
+func TestScheduler_EndsOnDate_Stops(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	due := "2026-03-01"
+	endsDate := "2026-03-01"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Expired", DueDate: &due})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{
+		Type: "daily", Interval: 5, EndsType: "on_date", EndsDate: &endsDate,
+	})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next != nil {
+		t.Errorf("expected nil when nextDate > endsDate, got task %d", next.ID)
+	}
+}
+
+func TestScheduler_NonRecurring(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "One shot"})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("unexpected error = %v", err)
+	}
+	if next != nil {
+		t.Errorf("expected nil for non-recurring task, got %v", next)
+	}
+}
+
+func TestScheduler_InheritsFields(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	due := "2026-02-26"
+	notes := "important notes"
+	recurTime := "09:00"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "With notes", DueDate: &due, Notes: &notes})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "daily", Interval: 1, EndsType: "never", Time: &recurTime})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskScheduleNext() error = %v", err)
+	}
+	if next == nil {
+		t.Fatal("expected next occurrence")
+	}
+	if next.Notes == nil || *next.Notes != notes {
+		t.Errorf("expected Notes=%q, got %v", notes, next.Notes)
+	}
+	if next.DueTime == nil || *next.DueTime != recurTime {
+		t.Errorf("expected DueTime=%q, got %v", recurTime, next.DueTime)
+	}
+}
+
+func TestScheduler_NilDueDate(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "No due"})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "daily", Interval: 1, EndsType: "never"})
+
+	next, err := repo.TaskScheduleNext(d, task.ID)
+	if err != nil {
+		t.Fatalf("unexpected error with nil due date: %v", err)
+	}
+	if next == nil {
+		t.Fatal("expected next occurrence")
+	}
+	// Should have a due date (today + 1)
+	if next.DueDate == nil {
+		t.Error("expected DueDate to be set")
+	}
+}
+
+// --- Autocomplete tests ---
+
+func TestAutocomplete_MarksAsDone(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	yesterday := "2026-02-25"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{
+		ListID:       l.ID,
+		Title:        "Overdue autocomplete",
+		DueDate:      &yesterday,
+		Autocomplete: true,
+	})
+
+	if err := repo.ProcessAutocompleteTasks(d); err != nil {
+		t.Fatalf("ProcessAutocompleteTasks() error = %v", err)
+	}
+
+	got, _ := repo.TaskGet(d, task.ID)
+	if !got.Completed {
+		t.Error("expected task to be completed by autocomplete")
+	}
+}
+
+func TestAutocomplete_NotYetDue(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	tomorrow := "2026-02-27"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{
+		ListID:       l.ID,
+		Title:        "Future task",
+		DueDate:      &tomorrow,
+		Autocomplete: true,
+	})
+
+	if err := repo.ProcessAutocompleteTasks(d); err != nil {
+		t.Fatalf("ProcessAutocompleteTasks() error = %v", err)
+	}
+
+	got, _ := repo.TaskGet(d, task.ID)
+	if got.Completed {
+		t.Error("expected task NOT to be completed (not yet due)")
+	}
+}
+
+func TestAutocomplete_RecurringChain(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	yesterday := "2026-02-25"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{
+		ListID:       l.ID,
+		Title:        "Weekly reminder",
+		DueDate:      &yesterday,
+		Autocomplete: true,
+	})
+	repo.TaskSetRecur(d, task.ID, repo.RecurInput{Type: "weekly", Interval: 1, EndsType: "never"})
+
+	if err := repo.ProcessAutocompleteTasks(d); err != nil {
+		t.Fatalf("ProcessAutocompleteTasks() error = %v", err)
+	}
+
+	got, _ := repo.TaskGet(d, task.ID)
+	if !got.Completed {
+		t.Error("expected original task to be completed")
+	}
+
+	false_ := false
+	all, err := repo.TaskList(d, repo.TaskListOptions{Completed: &false_})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(all) != 1 {
+		t.Errorf("expected 1 pending (next occurrence), got %d", len(all))
+	}
+	if all[0].Autocomplete != true {
+		t.Error("expected next occurrence to inherit autocomplete=true")
+	}
+}
+
+func TestAutocomplete_NonAutocomplete(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test")
+	yesterday := "2026-02-25"
+	task, _ := repo.TaskCreate(d, repo.TaskInput{
+		ListID:  l.ID,
+		Title:   "Manual task",
+		DueDate: &yesterday,
+		// Autocomplete: false (default)
+	})
+
+	if err := repo.ProcessAutocompleteTasks(d); err != nil {
+		t.Fatalf("ProcessAutocompleteTasks() error = %v", err)
+	}
+
+	got, _ := repo.TaskGet(d, task.ID)
+	if got.Completed {
+		t.Error("expected non-autocomplete task NOT to be completed")
+	}
+}

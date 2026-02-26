@@ -8,6 +8,7 @@ import (
 	"github.com/danielmrdev/dtasks-cli/internal/config"
 	"github.com/danielmrdev/dtasks-cli/internal/db"
 	"github.com/danielmrdev/dtasks-cli/internal/output"
+	"github.com/danielmrdev/dtasks-cli/internal/repo"
 	"github.com/spf13/cobra"
 )
 
@@ -41,6 +42,10 @@ var rootCmd = &cobra.Command{
 		DB, err = db.Open(dbPath)
 		if err != nil {
 			return fmt.Errorf("database: %w", err)
+		}
+
+		if err := repo.ProcessAutocompleteTasks(DB); err != nil {
+			fmt.Fprintf(os.Stderr, "warning: autocomplete processing failed: %v\n", err)
 		}
 		return nil
 	},

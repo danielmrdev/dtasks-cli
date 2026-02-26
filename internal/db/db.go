@@ -60,8 +60,6 @@ func migrate(db *sql.DB) error {
 		parent_task_id     INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
 		title              TEXT NOT NULL,
 		notes              TEXT,
-		date               TEXT,          -- YYYY-MM-DD
-		time               TEXT,          -- HH:MM (null = all-day)
 		due_date           TEXT,          -- YYYY-MM-DD
 		due_time           TEXT,          -- HH:MM (null = all-day)
 		completed          INTEGER NOT NULL DEFAULT 0,
@@ -77,6 +75,7 @@ func migrate(db *sql.DB) error {
 		recur_ends_date    TEXT,          -- YYYY-MM-DD
 		recur_ends_after   INTEGER,
 		recur_count        INTEGER NOT NULL DEFAULT 0,
+		autocomplete       INTEGER NOT NULL DEFAULT 0,
 		created_at         DATETIME NOT NULL DEFAULT (datetime('now'))
 	);
 
@@ -84,5 +83,28 @@ func migrate(db *sql.DB) error {
 	CREATE INDEX IF NOT EXISTS idx_tasks_parent  ON tasks(parent_task_id);
 	CREATE INDEX IF NOT EXISTS idx_tasks_due     ON tasks(due_date);
 	`)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Add autocomplete column if missing (existing DBs)
+	var count int
+	db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('tasks') WHERE name='autocomplete'`).Scan(&count)
+	if count == 0 {
+		if _, err := db.Exec(`ALTER TABLE tasks ADD COLUMN autocomplete INTEGER NOT NULL DEFAULT 0`); err != nil {
+			return fmt.Errorf("migrate autocomplete column: %w", err)
+		}
+	}
+
+	// Drop legacy date/time columns if still present
+	for _, col := range []string{"date", "time"} {
+		var n int
+		db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('tasks') WHERE name=?`, col).Scan(&n)
+		if n > 0 {
+			if _, err := db.Exec(`ALTER TABLE tasks DROP COLUMN ` + col); err != nil {
+				return fmt.Errorf("migrate drop column %s: %w", col, err)
+			}
+		}
+	}
+	return nil
 }
