@@ -1,0 +1,136 @@
+# Requirements: dtasks-cli v0.3.0
+
+**Defined:** 2026-03-06
+**Core Value:** Tasks are always reachable from the terminal with a single fast command — no UI, no login, no overhead.
+
+## v1 Requirements
+
+Requirements for v0.3.0 release. Each maps to a roadmap phase.
+
+### Filters
+
+- [ ] **FILT-01**: User can list tasks due today or earlier with `ls --today`
+- [ ] **FILT-02**: User can list tasks past their due date with `ls --overdue`
+- [ ] **FILT-03**: User can list tasks due tomorrow with `ls --tomorrow`
+- [ ] **FILT-04**: User can list tasks due within the next 7 days with `ls --week`
+
+### Sorting
+
+- [ ] **SORT-01**: User can sort task listing by due date, priority, created, or completed with `ls --sort=<field>`
+- [ ] **SORT-02**: User can reverse the sort order with `ls --reverse`
+
+### Search
+
+- [ ] **SRCH-01**: User can search tasks by keyword across title and notes with `dtasks find <keyword>` (case-insensitive)
+- [ ] **SRCH-02**: User can scope search to a specific list with `find --list <id>`
+- [ ] **SRCH-03**: User can search with a regex pattern with `find --regex`
+
+### Priority
+
+- [ ] **PRIO-01**: User can set task priority (high/medium/low) when adding a task with `add --priority <level>`
+- [ ] **PRIO-02**: User can set task priority when editing a task with `edit --priority <level>`
+- [ ] **PRIO-03**: Priority is shown as a visual indicator in table output
+- [ ] **PRIO-04**: Task listing can be sorted by priority
+
+### Maintenance
+
+- [ ] **MAINT-01**: User can bulk-delete completed tasks on or before a date with `rm --completed <date>`
+- [ ] **MAINT-02**: User can preview what would be deleted without committing with `rm --completed <date> --dry-run`
+- [ ] **MAINT-03**: Bulk delete requires explicit confirmation unless `--yes` is passed
+- [ ] **MAINT-04**: Bulk delete respects `--json` flag (emits `{"deleted": N}`)
+- [ ] **MAINT-05**: Bulk delete can be scoped to a specific list with `--list <id>`
+
+### Stats
+
+- [ ] **STAT-01**: User can view a task summary with `dtasks stats` (total, pending, done, % by list, upcoming due dates)
+- [ ] **STAT-02**: Stats command respects `--json` flag
+
+### Self-update
+
+- [ ] **UPDT-01**: User can check for and install updates with `dtasks update`
+- [ ] **UPDT-02**: `dtasks update` shows current version and latest available
+- [ ] **UPDT-03**: `dtasks update` downloads and atomically replaces the running binary for the correct OS/arch
+- [ ] **UPDT-04**: `dtasks update` respects `--json` flag
+
+### Install Completions
+
+- [ ] **COMP-01**: `install.sh` detects the user's current shell automatically
+- [ ] **COMP-02**: `install.sh` prompts interactively to install shell completions (skips when stdin is not a TTY)
+- [ ] **COMP-03**: Completions are written to the canonical location for bash, zsh, fish, and PowerShell
+- [ ] **COMP-04**: Completion setup also runs on upgrade (update path)
+
+### Skill Auto-install
+
+- [ ] **SKIL-01**: On first run (or during install), the CLI detects whether Claude is installed (`~/.claude/` or `claude` command)
+- [ ] **SKIL-02**: User is prompted for consent before copying the skill
+- [ ] **SKIL-03**: Skill is copied to the correct platform path (`~/.claude/skills/dtasks-cli/`)
+- [ ] **SKIL-04**: If skill already exists it is overwritten silently; if platform not found, install is skipped gracefully
+
+## v2 Requirements
+
+Deferred to future releases.
+
+### Notifications
+
+- System notifications on task due — high complexity, not core value
+
+### Tagging
+
+- Task tags / labels — deferred until priority UX is validated
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Sync / cloud backend | Not in scope for v0.3.0 |
+| Mobile app | CLI-first |
+| OAuth / team features | Single-user tool |
+| Real-time collaboration | Architecture mismatch |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| FILT-01 | Phase 1 | Pending |
+| FILT-02 | Phase 1 | Pending |
+| FILT-03 | Phase 1 | Pending |
+| FILT-04 | Phase 1 | Pending |
+| SORT-01 | Phase 1 | Pending |
+| SORT-02 | Phase 1 | Pending |
+| SRCH-01 | Phase 1 | Pending |
+| SRCH-02 | Phase 1 | Pending |
+| SRCH-03 | Phase 1 | Pending |
+| PRIO-01 | Phase 2 | Pending |
+| PRIO-02 | Phase 2 | Pending |
+| PRIO-03 | Phase 2 | Pending |
+| PRIO-04 | Phase 2 | Pending |
+| MAINT-01 | Phase 2 | Pending |
+| MAINT-02 | Phase 2 | Pending |
+| MAINT-03 | Phase 2 | Pending |
+| MAINT-04 | Phase 2 | Pending |
+| MAINT-05 | Phase 2 | Pending |
+| STAT-01 | Phase 2 | Pending |
+| STAT-02 | Phase 2 | Pending |
+| UPDT-01 | Phase 3 | Pending |
+| UPDT-02 | Phase 3 | Pending |
+| UPDT-03 | Phase 3 | Pending |
+| UPDT-04 | Phase 3 | Pending |
+| COMP-01 | Phase 3 | Pending |
+| COMP-02 | Phase 3 | Pending |
+| COMP-03 | Phase 3 | Pending |
+| COMP-04 | Phase 3 | Pending |
+| SKIL-01 | Phase 3 | Pending |
+| SKIL-02 | Phase 3 | Pending |
+| SKIL-03 | Phase 3 | Pending |
+| SKIL-04 | Phase 3 | Pending |
+
+**Coverage:**
+- v1 requirements: 32 total
+- Mapped to phases: 32
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-03-06*
+*Last updated: 2026-03-06 after initial definition*
