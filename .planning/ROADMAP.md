@@ -22,7 +22,12 @@ Brownfield project at v0.2.0. This milestone adds task querying (filters, sortin
   2. User can run `dtasks task ls --sort=due` (and `priority`, `created`, `completed`) and see tasks ordered accordingly; `--reverse` inverts the order
   3. User can run `dtasks find <keyword>` and receive all tasks whose title or notes contain the keyword (case-insensitive)
   4. User can scope `find` to a specific list with `--list <id>` and search with a regex pattern with `--regex`
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Test scaffold: failing tests for all 9 filter/sort/search requirements (TDD red phase)
+- [ ] 01-02-PLAN.md — Repo layer: extend TaskListOptions, refactor ORDER BY, add TaskSearch
+- [ ] 01-03-PLAN.md — CLI layer: lsCmd filter/sort flags, new findCmd top-level command
 
 ### Phase 2: Richness
 **Goal**: Users can assign priorities to tasks, bulk-clean completed tasks, and view task statistics
@@ -59,7 +64,7 @@ Brownfield project at v0.2.0. This milestone adds task querying (filters, sortin
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Querying | 0/? | Not started | - |
+| 1. Querying | 0/3 | Planning complete | - |
 | 2. Richness | 0/? | Not started | - |
 | 3. Tooling | 0/? | Not started | - |
 | 4. Release | 0/? | Not started | - |
