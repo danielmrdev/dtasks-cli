@@ -1073,3 +1073,285 @@ func TestTaskSearch_Regex(t *testing.T) {
 		t.Errorf("expected 1 match for '(?i)groceri', got %d", len(tasks))
 	}
 }
+
+// --- Phase 2 Richness tests (TDD red phase) ---
+
+func strPtr(s string) *string { return &s }
+
+// TestTaskCreate_WithPriority — PRIO-01
+func TestTaskCreate_WithPriority(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	task, err := repo.TaskCreate(d, repo.TaskInput{
+		ListID:   l.ID,
+		Title:    "High priority task",
+		Priority: strPtr("high"),
+	})
+	if err != nil {
+		t.Fatalf("TaskCreate() error = %v", err)
+	}
+
+	got, err := repo.TaskGet(d, task.ID)
+	if err != nil {
+		t.Fatalf("TaskGet() error = %v", err)
+	}
+	if got.Priority == nil || *got.Priority != "high" {
+		t.Errorf("expected Priority=high, got %v", got.Priority)
+	}
+
+	// nil priority
+	task2, err := repo.TaskCreate(d, repo.TaskInput{
+		ListID: l.ID,
+		Title:  "No priority task",
+	})
+	if err != nil {
+		t.Fatalf("TaskCreate() error = %v", err)
+	}
+	got2, _ := repo.TaskGet(d, task2.ID)
+	if got2.Priority != nil {
+		t.Errorf("expected Priority=nil, got %v", got2.Priority)
+	}
+}
+
+// TestTaskPatchFields_Priority — PRIO-02
+func TestTaskPatchFields_Priority(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	task, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Task"})
+
+	got, err := repo.TaskPatchFields(d, task.ID, repo.TaskPatch{Priority: strPtr("medium")})
+	if err != nil {
+		t.Fatalf("TaskPatchFields() error = %v", err)
+	}
+	if got.Priority == nil || *got.Priority != "medium" {
+		t.Errorf("expected Priority=medium, got %v", got.Priority)
+	}
+
+	// clear priority by passing empty string
+	got2, err := repo.TaskPatchFields(d, task.ID, repo.TaskPatch{Priority: strPtr("")})
+	if err != nil {
+		t.Fatalf("TaskPatchFields() error = %v", err)
+	}
+	if got2.Priority != nil {
+		t.Errorf("expected Priority=nil after clear, got %v", got2.Priority)
+	}
+}
+
+// TestTaskList_SortPriority — PRIO-04
+func TestTaskList_SortPriority(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	tHigh, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "High", Priority: strPtr("high")})
+	tLow, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Low", Priority: strPtr("low")})
+	tMed, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Medium", Priority: strPtr("medium")})
+
+	tasks, err := repo.TaskList(d, repo.TaskListOptions{SortBy: "priority"})
+	if err != nil {
+		t.Fatalf("TaskList() error = %v", err)
+	}
+	if len(tasks) != 3 {
+		t.Fatalf("expected 3 tasks, got %d", len(tasks))
+	}
+	// expected order: high → medium → low
+	if tasks[0].ID != tHigh.ID {
+		t.Errorf("expected first task to be high priority (ID=%d), got ID=%d", tHigh.ID, tasks[0].ID)
+	}
+	if tasks[1].ID != tMed.ID {
+		t.Errorf("expected second task to be medium priority (ID=%d), got ID=%d", tMed.ID, tasks[1].ID)
+	}
+	if tasks[2].ID != tLow.ID {
+		t.Errorf("expected third task to be low priority (ID=%d), got ID=%d", tLow.ID, tasks[2].ID)
+	}
+
+	// nil priority sorts last
+	tNil, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "No priority"})
+	tasks2, err := repo.TaskList(d, repo.TaskListOptions{SortBy: "priority"})
+	if err != nil {
+		t.Fatalf("TaskList() error = %v", err)
+	}
+	if len(tasks2) != 4 {
+		t.Fatalf("expected 4 tasks, got %d", len(tasks2))
+	}
+	if tasks2[3].ID != tNil.ID {
+		t.Errorf("expected nil-priority task last (ID=%d), got ID=%d", tNil.ID, tasks2[3].ID)
+	}
+}
+
+// TestTaskDeleteCompleted — MAINT-01
+func TestTaskDeleteCompleted(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	t1, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Done task 1"})
+	t2, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Done task 2"})
+
+	d.Exec(`UPDATE tasks SET completed = 1, completed_at = ? WHERE id = ?`, "2026-02-15T10:00:00Z", t1.ID)
+	d.Exec(`UPDATE tasks SET completed = 1, completed_at = ? WHERE id = ?`, "2026-02-15T10:00:00Z", t2.ID)
+
+	result, err := repo.TaskDeleteCompleted(d, repo.DeleteCompletedOptions{Before: "2026-03-01"})
+	if err != nil {
+		t.Fatalf("TaskDeleteCompleted() error = %v", err)
+	}
+	if result.Deleted != 2 {
+		t.Errorf("expected Deleted=2, got %d", result.Deleted)
+	}
+
+	_, err1 := repo.TaskGet(d, t1.ID)
+	_, err2 := repo.TaskGet(d, t2.ID)
+	if err1 == nil || err2 == nil {
+		t.Error("expected tasks to be deleted from DB")
+	}
+}
+
+// TestTaskDeleteCompleted_DryRun — MAINT-02
+func TestTaskDeleteCompleted_DryRun(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	t1, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Done task 1"})
+	t2, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Done task 2"})
+
+	d.Exec(`UPDATE tasks SET completed = 1, completed_at = ? WHERE id = ?`, "2026-02-15T10:00:00Z", t1.ID)
+	d.Exec(`UPDATE tasks SET completed = 1, completed_at = ? WHERE id = ?`, "2026-02-15T10:00:00Z", t2.ID)
+
+	result, err := repo.TaskDeleteCompleted(d, repo.DeleteCompletedOptions{
+		Before: "2026-03-01",
+		DryRun: true,
+	})
+	if err != nil {
+		t.Fatalf("TaskDeleteCompleted() dry run error = %v", err)
+	}
+	if result.Deleted != 0 {
+		t.Errorf("expected Deleted=0 in dry run, got %d", result.Deleted)
+	}
+	if len(result.Tasks) != 2 {
+		t.Errorf("expected Tasks slice len=2 in dry run, got %d", len(result.Tasks))
+	}
+
+	// tasks must still exist
+	got1, err1 := repo.TaskGet(d, t1.ID)
+	got2, err2 := repo.TaskGet(d, t2.ID)
+	if err1 != nil || err2 != nil {
+		t.Errorf("tasks should still exist after dry run: err1=%v, err2=%v", err1, err2)
+	}
+	_ = got1
+	_ = got2
+}
+
+// TestTaskDeleteCompleted_Scoped — MAINT-05
+func TestTaskDeleteCompleted_Scoped(t *testing.T) {
+	d := openTestDB(t)
+	l1, _ := repo.ListCreate(d, "List1", nil)
+	l2, _ := repo.ListCreate(d, "List2", nil)
+
+	tA, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l1.ID, Title: "Done in L1"})
+	tB, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l2.ID, Title: "Done in L2"})
+
+	today := "2026-03-06"
+	d.Exec(`UPDATE tasks SET completed = 1, completed_at = ? WHERE id = ?`, "2026-02-15T10:00:00Z", tA.ID)
+	d.Exec(`UPDATE tasks SET completed = 1, completed_at = ? WHERE id = ?`, "2026-02-15T10:00:00Z", tB.ID)
+
+	result, err := repo.TaskDeleteCompleted(d, repo.DeleteCompletedOptions{
+		ListID: &l1.ID,
+		Before: today,
+	})
+	if err != nil {
+		t.Fatalf("TaskDeleteCompleted() scoped error = %v", err)
+	}
+	if result.Deleted != 1 {
+		t.Errorf("expected Deleted=1 (only list1 task), got %d", result.Deleted)
+	}
+
+	// list1 task deleted
+	_, err1 := repo.TaskGet(d, tA.ID)
+	if err1 == nil {
+		t.Error("expected list1 task to be deleted")
+	}
+	// list2 task still exists
+	_, err2 := repo.TaskGet(d, tB.ID)
+	if err2 != nil {
+		t.Errorf("expected list2 task to still exist, got error: %v", err2)
+	}
+}
+
+// TestTaskStats — STAT-01
+func TestTaskStats(t *testing.T) {
+	d := openTestDB(t)
+	l1, _ := repo.ListCreate(d, "List1", nil)
+	l2, _ := repo.ListCreate(d, "List2", nil)
+	l3, _ := repo.ListCreate(d, "List3", nil) // empty list
+
+	// list1: 2 pending + 1 done
+	repo.TaskCreate(d, repo.TaskInput{ListID: l1.ID, Title: "Pending 1"})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l1.ID, Title: "Pending 2"})
+	tDone, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l1.ID, Title: "Done"})
+	d.Exec(`UPDATE tasks SET completed = 1, completed_at = datetime('now') WHERE id = ?`, tDone.ID)
+
+	// list2: 1 pending
+	repo.TaskCreate(d, repo.TaskInput{ListID: l2.ID, Title: "Pending in L2"})
+
+	_ = l3 // no tasks in l3
+
+	summary, err := repo.TaskStats(d)
+	if err != nil {
+		t.Fatalf("TaskStats() error = %v", err)
+	}
+
+	if summary.Total != 4 {
+		t.Errorf("expected Total=4, got %d", summary.Total)
+	}
+	if summary.Pending != 3 {
+		t.Errorf("expected Pending=3, got %d", summary.Pending)
+	}
+	if summary.Done != 1 {
+		t.Errorf("expected Done=1, got %d", summary.Done)
+	}
+	if len(summary.ByList) != 3 {
+		t.Errorf("expected ByList len=3 (including empty list), got %d", len(summary.ByList))
+	}
+
+	// find list1 entry
+	var list1Entry *repo.ListStats
+	for i := range summary.ByList {
+		if summary.ByList[i].ListID == l1.ID {
+			list1Entry = &summary.ByList[i]
+			break
+		}
+	}
+	if list1Entry == nil {
+		t.Fatal("list1 entry not found in ByList")
+	}
+	if list1Entry.Total != 3 {
+		t.Errorf("list1: expected Total=3, got %d", list1Entry.Total)
+	}
+	if list1Entry.Pending != 2 {
+		t.Errorf("list1: expected Pending=2, got %d", list1Entry.Pending)
+	}
+	if list1Entry.Done != 1 {
+		t.Errorf("list1: expected Done=1, got %d", list1Entry.Done)
+	}
+
+	// find list2 entry
+	var list2Entry *repo.ListStats
+	for i := range summary.ByList {
+		if summary.ByList[i].ListID == l2.ID {
+			list2Entry = &summary.ByList[i]
+			break
+		}
+	}
+	if list2Entry == nil {
+		t.Fatal("list2 entry not found in ByList")
+	}
+	if list2Entry.Total != 1 {
+		t.Errorf("list2: expected Total=1, got %d", list2Entry.Total)
+	}
+	if list2Entry.Pending != 1 {
+		t.Errorf("list2: expected Pending=1, got %d", list2Entry.Pending)
+	}
+	if list2Entry.Done != 0 {
+		t.Errorf("list2: expected Done=0, got %d", list2Entry.Done)
+	}
+}
