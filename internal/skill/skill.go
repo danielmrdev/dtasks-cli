@@ -44,18 +44,17 @@ func InstallSkill(homeDir string, content []byte) error {
 
 // PromptAndInstall checks whether in is a real TTY.
 // If it is not a TTY, it calls InstallSkill directly without prompting.
-// If it is a TTY, it prompts "Install dtasks skill for Claude Code? [y/N] " and installs on y/Y.
-// If DetectClaude returns false, it returns nil immediately (graceful skip).
+// If it is a TTY and DetectClaude returns false, it returns nil immediately (graceful skip).
+// If it is a TTY and Claude is detected, it prompts "Install dtasks skill for Claude Code? [y/N] " and installs on y/Y.
 func PromptAndInstall(homeDir string, content []byte, in io.Reader, out io.Writer) error {
-	if !DetectClaude(homeDir) {
-		return nil
-	}
-
 	type fder interface {
 		Fd() uintptr
 	}
 
 	if f, ok := in.(fder); ok && term.IsTerminal(int(f.Fd())) {
+		if !DetectClaude(homeDir) {
+			return nil
+		}
 		fmt.Fprint(out, "Install dtasks skill for Claude Code? [y/N] ")
 		reader := bufio.NewReader(in)
 		line, err := reader.ReadString('\n')
