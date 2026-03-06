@@ -27,23 +27,23 @@ Requirements for v0.3.0 release. Each maps to a roadmap phase.
 
 ### Priority
 
-- [ ] **PRIO-01**: User can set task priority (high/medium/low) when adding a task with `add --priority <level>`
-- [ ] **PRIO-02**: User can set task priority when editing a task with `edit --priority <level>`
-- [ ] **PRIO-03**: Priority is shown as a visual indicator in table output
-- [ ] **PRIO-04**: Task listing can be sorted by priority
+- [x] **PRIO-01**: User can set task priority (high/medium/low) when adding a task with `add --priority <level>`
+- [x] **PRIO-02**: User can set task priority when editing a task with `edit --priority <level>`
+- [x] **PRIO-03**: Priority is shown as a visual indicator in table output
+- [x] **PRIO-04**: Task listing can be sorted by priority
 
 ### Maintenance
 
-- [ ] **MAINT-01**: User can bulk-delete completed tasks on or before a date with `rm --completed <date>`
-- [ ] **MAINT-02**: User can preview what would be deleted without committing with `rm --completed <date> --dry-run`
+- [x] **MAINT-01**: User can bulk-delete completed tasks on or before a date with `rm --completed <date>`
+- [x] **MAINT-02**: User can preview what would be deleted without committing with `rm --completed <date> --dry-run`
 - [ ] **MAINT-03**: Bulk delete requires explicit confirmation unless `--yes` is passed
-- [ ] **MAINT-04**: Bulk delete respects `--json` flag (emits `{"deleted": N}`)
-- [ ] **MAINT-05**: Bulk delete can be scoped to a specific list with `--list <id>`
+- [x] **MAINT-04**: Bulk delete respects `--json` flag (emits `{"deleted": N}`)
+- [x] **MAINT-05**: Bulk delete can be scoped to a specific list with `--list <id>`
 
 ### Stats
 
-- [ ] **STAT-01**: User can view a task summary with `dtasks stats` (total, pending, done, % by list, upcoming due dates)
-- [ ] **STAT-02**: Stats command respects `--json` flag
+- [x] **STAT-01**: User can view a task summary with `dtasks stats` (total, pending, done, % by list, upcoming due dates)
+- [x] **STAT-02**: Stats command respects `--json` flag
 
 ### Self-update
 
@@ -102,17 +102,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRCH-01 | Phase 1 | Complete |
 | SRCH-02 | Phase 1 | Complete |
 | SRCH-03 | Phase 1 | Complete |
-| PRIO-01 | Phase 2 | Pending |
-| PRIO-02 | Phase 2 | Pending |
-| PRIO-03 | Phase 2 | Pending |
-| PRIO-04 | Phase 2 | Pending |
-| MAINT-01 | Phase 2 | Pending |
-| MAINT-02 | Phase 2 | Pending |
+| PRIO-01 | Phase 2 | Complete |
+| PRIO-02 | Phase 2 | Complete |
+| PRIO-03 | Phase 2 | Complete |
+| PRIO-04 | Phase 2 | Complete |
+| MAINT-01 | Phase 2 | Complete |
+| MAINT-02 | Phase 2 | Complete |
 | MAINT-03 | Phase 2 | Pending |
-| MAINT-04 | Phase 2 | Pending |
-| MAINT-05 | Phase 2 | Pending |
-| STAT-01 | Phase 2 | Pending |
-| STAT-02 | Phase 2 | Pending |
+| MAINT-04 | Phase 2 | Complete |
+| MAINT-05 | Phase 2 | Complete |
+| STAT-01 | Phase 2 | Complete |
+| STAT-02 | Phase 2 | Complete |
 | UPDT-01 | Phase 3 | Pending |
 | UPDT-02 | Phase 3 | Pending |
 | UPDT-03 | Phase 3 | Pending |

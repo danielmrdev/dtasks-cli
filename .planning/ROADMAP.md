@@ -71,6 +71,6 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Querying | 3/3 | Complete   | 2026-03-06 |
-| 2. Richness | 0/4 | Planned    | - |
+| 2. Richness | 1/4 | In Progress|  |
 | 3. Tooling | 0/? | Not started | - |
 | 4. Release | 0/? | Not started | - |
