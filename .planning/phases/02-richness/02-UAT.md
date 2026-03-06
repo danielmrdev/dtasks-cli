@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 02-richness
 source: 02-01-SUMMARY.md, 02-02-SUMMARY.md, 02-03-SUMMARY.md, 02-04-SUMMARY.md
 started: 2026-03-06T09:26:57Z
@@ -74,21 +74,37 @@ skipped: 0
   reason: "User reported: dry-run muestra mensaje: This will permanently delete 0 task(s). Confirm? [y/N]: y\nDeleted 0 task(s).\n\nincorrecto. además hay tareas completadas y muestra 0 -> mal"
   severity: major
   test: 6
-  artifacts: []
-  missing: []
+  root_cause: "cmd/task.go:399 declara --completed como StringVar en lugar de BoolVar. Cobra consume '--dry-run' como valor string de --completed, rmDryRun queda false, y la query recibe '--dry-run' como fecha cutoff → date('--dry-run') = NULL → 0 filas"
+  artifacts:
+    - path: "cmd/task.go"
+      issue: "line 316: var rmCompleted string; line 399: StringVar instead of BoolVar"
+    - path: "internal/repo/task.go"
+      issue: "line 363: query requires Before date string; needs to handle boolean/no-date case"
+  missing:
+    - "Change --completed to BoolVar in cmd/task.go"
+    - "Update DeleteCompletedOptions and TaskDeleteCompleted to work without mandatory date cutoff"
+    - "Update rmCmd logic to call TaskDeleteCompleted with DryRun=true first, show count, then prompt"
 
 - truth: "rm --completed is a boolean flag that deletes all completed tasks; --yes skips confirmation prompt; count is accurate"
   status: failed
   reason: "User reported: error de concepto: `dist/dtasks rm --completed` → Error: flag needs an argument (--completed string: on or before YYYY-MM-DD). Con --dry-run salta directo al prompt de confirmación. Con --yes muestra 0 tareas y sigue mostrando el prompt."
   severity: major
   test: 7
-  artifacts: []
-  missing: []
+  root_cause: "Same root: --completed StringVar causes Cobra to consume '--yes' as its value. rmYes stays false → prompt always appears. Query gets '--yes' as date → 0 matches."
+  artifacts:
+    - path: "cmd/task.go"
+      issue: "line 399: StringVar instead of BoolVar — cascades to --yes and --dry-run not being parsed"
+  missing:
+    - "Change --completed to BoolVar; --yes and --dry-run will parse correctly after that fix"
 
 - truth: "rm --completed --list <name> scopes bulk delete to tasks in a specific list"
   status: failed
   reason: "User reported: dist/dtasks rm --completed --list 2 → Error: --completed cannot be used with a task ID argument"
   severity: major
   test: 8
-  artifacts: []
-  missing: []
+  root_cause: "Same root: --completed StringVar causes Cobra to consume '--list' as its value, leaving '2' as positional arg[0]. Guard at cmd/task.go:329-332 detects len(args)>0 and errors."
+  artifacts:
+    - path: "cmd/task.go"
+      issue: "lines 329-332: guard fires because --list value is consumed by --completed StringVar, leaving numeric arg"
+  missing:
+    - "Change --completed to BoolVar; --list will parse correctly after that fix"
