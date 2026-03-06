@@ -38,7 +38,13 @@ Plans:
   2. User can sort tasks by priority with `ls --sort=priority`
   3. User can run `dtasks rm --completed <date>` to bulk-delete completed tasks; `--dry-run` previews without deleting; `--yes` skips confirmation; `--list <id>` scopes to one list
   4. User can run `dtasks stats` and see total, pending, done, and percentage per list; `--json` outputs structured JSON
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — TDD red phase: failing tests for all 11 Phase 2 requirements
+- [ ] 02-02-PLAN.md — Repo layer: schema migration, model extension, TaskDeleteCompleted, TaskStats
+- [ ] 02-03-PLAN.md — Output layer: PRIO column in PrintTasks, new PrintStats function
+- [ ] 02-04-PLAN.md — CLI layer: priority flags on add/edit, extended rmCmd, new statsCmd
 
 ### Phase 3: Tooling
 **Goal**: Users can update the binary in-place, install shell completions, and have the dtasks skill auto-installed for Claude
@@ -65,6 +71,6 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Querying | 3/3 | Complete   | 2026-03-06 |
-| 2. Richness | 0/? | Not started | - |
+| 2. Richness | 0/4 | Planned    | - |
 | 3. Tooling | 0/? | Not started | - |
 | 4. Release | 0/? | Not started | - |
