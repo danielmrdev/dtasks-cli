@@ -354,6 +354,11 @@ var rmCmd = &cobra.Command{
 				output.PrintTasks(result.Tasks)
 				return nil
 			}
+			// No tasks match: exit early without prompting
+			if len(result.Tasks) == 0 {
+				fmt.Println("No completed tasks to delete.")
+				return nil
+			}
 			// Non-dry-run: require confirmation (MAINT-03)
 			if !rmYes && !output.JSONMode {
 				if !isTerminal(os.Stdin) {
