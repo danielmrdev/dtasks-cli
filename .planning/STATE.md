@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 03-tooling-02-PLAN.md
-last_updated: "2026-03-06T12:20:20.894Z"
+stopped_at: Completed 03-tooling-03-PLAN.md
+last_updated: "2026-03-06T12:23:13.683Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 13
-  completed_plans: 10
+  completed_plans: 11
   percent: 33
 ---
 
@@ -60,6 +60,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 02-richness P05 | 8min | 2 tasks | 3 files |
 | Phase 03-tooling P01 | 2min | 3 tasks | 7 files |
 | Phase 03-tooling P02 | 1min | 2 tasks | 1 files |
+| Phase 03-tooling P03 | 2 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Recent decisions affecting current work:
 - [Phase 03-tooling]: golang.org/x/term added as direct dependency for TTY detection in PromptAndInstall
 - [Phase 03-tooling]: DownloadAndReplace uses filepath.Dir(exePath) for temp dir — avoids cross-device rename failure
 - [Phase 03-tooling]: io.Copy streams download to temp file — no io.ReadAll buffering, safe for large binaries
+- [Phase 03-tooling]: Non-TTY path in PromptAndInstall installs directly without prompting (programmatic install path for updateCmd)
+- [Phase 03-tooling]: TTY detection via interface{ Fd() uintptr } type assertion on io.Reader, using golang.org/x/term.IsTerminal
+- [Phase 03-tooling]: PromptAndInstall returns nil (graceful skip) when Claude not detected or user declines — no error on skip
 
 ### Pending Todos
 
@@ -103,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T12:20:20.891Z
-Stopped at: Completed 03-tooling-02-PLAN.md
+Last session: 2026-03-06T12:23:13.681Z
+Stopped at: Completed 03-tooling-03-PLAN.md
 Resume file: None
