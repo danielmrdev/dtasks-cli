@@ -55,7 +55,14 @@ Plans:
   1. User can run `dtasks update` to see current and latest version, and the command downloads and atomically replaces the binary for the correct OS/arch; `--json` outputs structured result
   2. `install.sh` detects the user's shell, prompts for completion install (skips if non-TTY), and writes completions to the canonical location for bash, zsh, fish, and PowerShell; this also runs on upgrade
   3. On first run (or install), the CLI detects Claude and prompts for consent before copying the skill to `~/.claude/skills/dtasks-cli/`; overwrites silently if already present; skips gracefully if platform not found
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — TDD red phase: test scaffolds for updater and skill packages
+- [ ] 03-02-PLAN.md — internal/updater: FetchLatestVersion, AssetName, DownloadAndReplace
+- [ ] 03-03-PLAN.md — internal/skill: DetectClaude, InstallSkill, PromptAndInstall
+- [ ] 03-04-PLAN.md — cmd/update.go: updateCmd Cobra command + skill embed + root wiring
+- [ ] 03-05-PLAN.md — install.sh + install.ps1: shell completion install blocks
 
 ### Phase 4: Release
 **Goal**: v0.3.0 ships as a tagged GitHub release with compiled assets for all platforms
@@ -73,5 +80,5 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Querying | 3/3 | Complete   | 2026-03-06 |
 | 2. Richness | 4/5 | Gap closure | - |
-| 3. Tooling | 0/? | Not started | - |
+| 3. Tooling | 0/5 | Planned | - |
 | 4. Release | 0/? | Not started | - |
