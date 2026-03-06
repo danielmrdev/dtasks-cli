@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 03-tooling-05-PLAN.md
-last_updated: "2026-03-06T13:02:33.551Z"
+stopped_at: Completed 04-release-01-PLAN.md
+last_updated: "2026-03-06T14:27:46.586Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 15
+  completed_plans: 14
   percent: 33
 ---
 
@@ -63,6 +63,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 03-tooling P03 | 2 | 2 tasks | 1 files |
 | Phase 03-tooling P04 | 8min | 2 tasks | 6 files |
 | Phase 03-tooling P05 | 10min | 2 tasks | 2 files |
+| Phase 04-release P01 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,7 @@ Recent decisions affecting current work:
 - [Phase 03-tooling]: PersistentPreRunE skips DB init for update command — works on fresh installs with no config
 - [Phase 03-tooling]: install_completions() uses the just-installed binary path (not bare dtasks) to generate completions — ensures correct binary is used before PATH is updated
 - [Phase 03-tooling]: POSIX [ -t 0 ] TTY check skips completions in non-interactive environments (CI/pipe) — idempotent install.ps1 append guards against duplicate profile entries on upgrade
+- [Phase 04-release]: Committed fix(rm) and chore(planning) as separate commits; PR #19 open against main; tag deferred until merge
 
 ### Pending Todos
 
@@ -115,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T12:41:55.243Z
-Stopped at: Completed 03-tooling-05-PLAN.md
+Last session: 2026-03-06T14:27:46.584Z
+Stopped at: Completed 04-release-01-PLAN.md
 Resume file: None
