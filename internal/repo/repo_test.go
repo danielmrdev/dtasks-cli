@@ -668,7 +668,7 @@ func TestAutocomplete_MarksAsDone(t *testing.T) {
 func TestAutocomplete_NotYetDue(t *testing.T) {
 	d := openTestDB(t)
 	l, _ := repo.ListCreate(d, "Test", nil)
-	tomorrow := "2026-02-27"
+	tomorrow := time.Now().AddDate(0, 0, 1).Format("2006-01-02")
 	task, _ := repo.TaskCreate(d, repo.TaskInput{
 		ListID:       l.ID,
 		Title:        "Future task",

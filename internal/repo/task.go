@@ -19,14 +19,15 @@ type TaskInput struct {
 	DueDate      *string
 	DueTime      *string
 	Autocomplete bool
+	Priority     *string
 }
 
 func TaskCreate(db *sql.DB, in TaskInput) (*models.Task, error) {
 	res, err := db.Exec(`
-		INSERT INTO tasks (list_id, parent_task_id, title, notes, due_date, due_time, autocomplete)
-		VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		INSERT INTO tasks (list_id, parent_task_id, title, notes, due_date, due_time, autocomplete, priority)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
 		in.ListID, in.ParentTaskID, in.Title, in.Notes,
-		in.DueDate, in.DueTime, boolToInt(in.Autocomplete),
+		in.DueDate, in.DueTime, boolToInt(in.Autocomplete), in.Priority,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("create task: %w", err)
@@ -50,7 +51,7 @@ type TaskListOptions struct {
 	Overdue     bool
 	DueTomorrow bool
 	DueWeek     bool
-	SortBy      string // "due" | "created" | "completed"
+	SortBy      string // "due" | "created" | "completed" | "priority"
 	Reverse     bool
 }
 
@@ -103,6 +104,7 @@ func TaskList(db *sql.DB, opts TaskListOptions) ([]models.Task, error) {
 		"due":       "t.due_date ASC, t.due_time ASC, t.created_at ASC",
 		"created":   "t.created_at ASC",
 		"completed": "t.completed_at ASC",
+		"priority":  "CASE t.priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 ELSE 4 END ASC, t.created_at ASC",
 	}
 	orderExpr, ok := sortMap[opts.SortBy]
 	if !ok {
@@ -217,6 +219,7 @@ type TaskPatch struct {
 	DueTime      *string
 	ListID       *int64
 	Autocomplete *bool
+	Priority     *string
 }
 
 func TaskPatchFields(db *sql.DB, id int64, p TaskPatch) (*models.Task, error) {
@@ -248,6 +251,13 @@ func TaskPatchFields(db *sql.DB, id int64, p TaskPatch) (*models.Task, error) {
 	}
 	if p.Autocomplete != nil {
 		add("autocomplete", boolToInt(*p.Autocomplete))
+	}
+	if p.Priority != nil {
+		if *p.Priority == "" {
+			add("priority", nil)
+		} else {
+			add("priority", *p.Priority)
+		}
 	}
 
 	if set == "" {
@@ -334,6 +344,121 @@ func TaskRemoveRecur(db *sql.DB, id int64) error {
 			recur_ends_date = NULL, recur_ends_after = NULL, recur_count = 0
 		WHERE id = ?`, id)
 	return err
+}
+
+// --- Bulk delete ---
+
+type DeleteCompletedOptions struct {
+	Before string
+	ListID *int64
+	DryRun bool
+}
+
+type DeleteCompletedResult struct {
+	Tasks   []models.Task
+	Deleted int
+}
+
+func TaskDeleteCompleted(db *sql.DB, opts DeleteCompletedOptions) (DeleteCompletedResult, error) {
+	where := ` WHERE t.completed = 1 AND date(t.completed_at) <= ?`
+	args := []any{opts.Before}
+	if opts.ListID != nil {
+		where += ` AND t.list_id = ?`
+		args = append(args, *opts.ListID)
+	}
+	rows, err := db.Query(taskSelectSQL+where, args...)
+	if err != nil {
+		return DeleteCompletedResult{}, err
+	}
+	defer rows.Close()
+	var tasks []models.Task
+	for rows.Next() {
+		t, err := scanTaskRow(rows)
+		if err != nil {
+			return DeleteCompletedResult{}, err
+		}
+		tasks = append(tasks, *t)
+	}
+	if err := rows.Err(); err != nil {
+		return DeleteCompletedResult{}, err
+	}
+	if opts.DryRun {
+		return DeleteCompletedResult{Tasks: tasks, Deleted: 0}, nil
+	}
+	delWhere := ` WHERE completed = 1 AND date(completed_at) <= ?`
+	delArgs := []any{opts.Before}
+	if opts.ListID != nil {
+		delWhere += ` AND list_id = ?`
+		delArgs = append(delArgs, *opts.ListID)
+	}
+	res, err := db.Exec(`DELETE FROM tasks`+delWhere, delArgs...)
+	if err != nil {
+		return DeleteCompletedResult{}, fmt.Errorf("bulk delete completed tasks: %w", err)
+	}
+	n, _ := res.RowsAffected()
+	return DeleteCompletedResult{Tasks: tasks, Deleted: int(n)}, nil
+}
+
+// --- Stats ---
+
+type ListStat struct {
+	ListID   int64   `json:"list_id"`
+	ListName string  `json:"list_name"`
+	Total    int     `json:"total"`
+	Pending  int     `json:"pending"`
+	Done     int     `json:"done"`
+	PctDone  float64 `json:"pct_done"`
+}
+
+// ListStats is an alias for ListStat for backwards compatibility with tests.
+type ListStats = ListStat
+
+type StatsSummary struct {
+	Total   int        `json:"total"`
+	Pending int        `json:"pending"`
+	Done    int        `json:"done"`
+	PctDone float64    `json:"pct_done"`
+	ByList  []ListStat `json:"by_list"`
+}
+
+func TaskStats(db *sql.DB) (*StatsSummary, error) {
+	const statsSQL = `
+		SELECT
+			l.id, l.name,
+			COUNT(t.id) AS total,
+			SUM(CASE WHEN t.completed = 0 AND t.id IS NOT NULL THEN 1 ELSE 0 END) AS pending,
+			SUM(CASE WHEN t.completed = 1 THEN 1 ELSE 0 END) AS done
+		FROM lists l
+		LEFT JOIN tasks t ON t.list_id = l.id AND t.parent_task_id IS NULL
+		GROUP BY l.id, l.name
+		ORDER BY l.name ASC
+	`
+	rows, err := db.Query(statsSQL)
+	if err != nil {
+		return nil, fmt.Errorf("stats query: %w", err)
+	}
+	defer rows.Close()
+	s := &StatsSummary{}
+	for rows.Next() {
+		var ls ListStat
+		if err := rows.Scan(&ls.ListID, &ls.ListName, &ls.Total, &ls.Pending, &ls.Done); err != nil {
+			return nil, fmt.Errorf("scan stats row: %w", err)
+		}
+		if ls.Total > 0 {
+			ls.PctDone = float64(ls.Done) / float64(ls.Total) * 100
+		}
+		s.Total += ls.Total
+		s.Pending += ls.Pending
+		s.Done += ls.Done
+		s.ByList = append(s.ByList, ls)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	if s.Total > 0 {
+		s.PctDone = float64(s.Done) / float64(s.Total) * 100
+	}
+	return s, nil
 }
 
 // --- Helpers ---
