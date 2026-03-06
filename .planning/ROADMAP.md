@@ -80,5 +80,5 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Querying | 3/3 | Complete   | 2026-03-06 |
 | 2. Richness | 4/5 | Gap closure | - |
-| 3. Tooling | 3/5 | In Progress|  |
+| 3. Tooling | 4/5 | In Progress|  |
 | 4. Release | 0/? | Not started | - |

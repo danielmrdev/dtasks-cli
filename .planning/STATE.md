@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 03-tooling-03-PLAN.md
-last_updated: "2026-03-06T12:23:13.683Z"
+stopped_at: Completed 03-tooling-04-PLAN.md
+last_updated: "2026-03-06T12:32:18.773Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 12
   percent: 33
 ---
 
@@ -61,6 +61,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 03-tooling P01 | 2min | 3 tasks | 7 files |
 | Phase 03-tooling P02 | 1min | 2 tasks | 1 files |
 | Phase 03-tooling P03 | 2 | 2 tasks | 1 files |
+| Phase 03-tooling P04 | 8min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,10 @@ Recent decisions affecting current work:
 - [Phase 03-tooling]: Non-TTY path in PromptAndInstall installs directly without prompting (programmatic install path for updateCmd)
 - [Phase 03-tooling]: TTY detection via interface{ Fd() uintptr } type assertion on io.Reader, using golang.org/x/term.IsTerminal
 - [Phase 03-tooling]: PromptAndInstall returns nil (graceful skip) when Claude not detected or user declines — no error on skip
+- [Phase 03-tooling]: GHAPIBase exported (was ghAPIBase) to allow cross-package test injection without reflection
+- [Phase 03-tooling]: skilldata wrapper package in skills/dtasks-cli/ — Go //go:embed prohibits .. path traversal
+- [Phase 03-tooling]: cmd.OutOrStdout() for updateCmd — os.Stdout bypasses Cobra SetOut in tests
+- [Phase 03-tooling]: PersistentPreRunE skips DB init for update command — works on fresh installs with no config
 
 ### Pending Todos
 
@@ -107,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T12:23:13.681Z
-Stopped at: Completed 03-tooling-03-PLAN.md
+Last session: 2026-03-06T12:32:18.770Z
+Stopped at: Completed 03-tooling-04-PLAN.md
 Resume file: None
