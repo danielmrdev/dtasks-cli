@@ -54,10 +54,10 @@ Requirements for v0.3.0 release. Each maps to a roadmap phase.
 
 ### Install Completions
 
-- [ ] **COMP-01**: `install.sh` detects the user's current shell automatically
-- [ ] **COMP-02**: `install.sh` prompts interactively to install shell completions (skips when stdin is not a TTY)
-- [ ] **COMP-03**: Completions are written to the canonical location for bash, zsh, fish, and PowerShell
-- [ ] **COMP-04**: Completion setup also runs on upgrade (update path)
+- [x] **COMP-01**: `install.sh` detects the user's current shell automatically
+- [x] **COMP-02**: `install.sh` prompts interactively to install shell completions (skips when stdin is not a TTY)
+- [x] **COMP-03**: Completions are written to the canonical location for bash, zsh, fish, and PowerShell
+- [x] **COMP-04**: Completion setup also runs on upgrade (update path)
 
 ### Skill Auto-install
 
@@ -117,10 +117,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UPDT-02 | Phase 3 | Complete |
 | UPDT-03 | Phase 3 | Complete |
 | UPDT-04 | Phase 3 | Complete |
-| COMP-01 | Phase 3 | Pending |
-| COMP-02 | Phase 3 | Pending |
-| COMP-03 | Phase 3 | Pending |
-| COMP-04 | Phase 3 | Pending |
+| COMP-01 | Phase 3 | Complete |
+| COMP-02 | Phase 3 | Complete |
+| COMP-03 | Phase 3 | Complete |
+| COMP-04 | Phase 3 | Complete |
 | SKIL-01 | Phase 3 | Complete |
 | SKIL-02 | Phase 3 | Complete |
 | SKIL-03 | Phase 3 | Complete |

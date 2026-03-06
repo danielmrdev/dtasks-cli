@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 03-tooling-04-PLAN.md
-last_updated: "2026-03-06T12:32:18.773Z"
+stopped_at: Completed 03-tooling-05-PLAN.md
+last_updated: "2026-03-06T12:41:55.246Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 13
-  completed_plans: 12
+  completed_plans: 13
   percent: 33
 ---
 
@@ -62,6 +62,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 03-tooling P02 | 1min | 2 tasks | 1 files |
 | Phase 03-tooling P03 | 2 | 2 tasks | 1 files |
 | Phase 03-tooling P04 | 8min | 2 tasks | 6 files |
+| Phase 03-tooling P05 | 10min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,8 @@ Recent decisions affecting current work:
 - [Phase 03-tooling]: skilldata wrapper package in skills/dtasks-cli/ — Go //go:embed prohibits .. path traversal
 - [Phase 03-tooling]: cmd.OutOrStdout() for updateCmd — os.Stdout bypasses Cobra SetOut in tests
 - [Phase 03-tooling]: PersistentPreRunE skips DB init for update command — works on fresh installs with no config
+- [Phase 03-tooling]: install_completions() uses the just-installed binary path (not bare dtasks) to generate completions — ensures correct binary is used before PATH is updated
+- [Phase 03-tooling]: POSIX [ -t 0 ] TTY check skips completions in non-interactive environments (CI/pipe) — idempotent install.ps1 append guards against duplicate profile entries on upgrade
 
 ### Pending Todos
 
@@ -112,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T12:32:18.770Z
-Stopped at: Completed 03-tooling-04-PLAN.md
+Last session: 2026-03-06T12:41:55.243Z
+Stopped at: Completed 03-tooling-05-PLAN.md
 Resume file: None
