@@ -1,15 +1,3 @@
-//go:build ignore
-// +build ignore
-
-// update_test.go contains the TDD red-phase tests for the update subcommand.
-// This file uses //go:build ignore so it compiles without errors while updateCmd
-// does not yet exist. Plan 03-04 creates cmd/update.go and removes the build tag,
-// activating these tests.
-//
-// Tests covered:
-//   - TestUpdateCmd_JSON: --json output contains "current" and "latest" keys
-//   - TestUpdateCmd_Help: --help exits 0 and mentions "Check for"
-
 package cmd
 
 import (
@@ -19,10 +7,12 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/danielmrdev/dtasks-cli/internal/updater"
 )
 
 // TestUpdateCmd_JSON verifies that `dtasks update --json` emits a JSON object
-// with at least the "current" and "latest" keys.
+// with at least the "current" and "latest" keys and updated=false when versions match.
 func TestUpdateCmd_JSON(t *testing.T) {
 	// Mock the GitHub API to return a fixed latest version.
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -31,18 +21,25 @@ func TestUpdateCmd_JSON(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	// NOTE: The updater package exposes ghAPIBase for test overrides.
-	// Uncomment and adjust the import when update.go is created.
-	// updater.SetGHAPIBase(srv.URL)
+	origBase := updater.GHAPIBase
+	updater.GHAPIBase = srv.URL
+	t.Cleanup(func() { updater.GHAPIBase = origBase })
+
+	origVersion := rootCmd.Version
+	rootCmd.Version = "0.3.0"
+	t.Cleanup(func() { rootCmd.Version = origVersion })
 
 	var buf bytes.Buffer
 	rootCmd.SetOut(&buf)
 	rootCmd.SetErr(&buf)
 	rootCmd.SetArgs([]string{"update", "--json"})
+	t.Cleanup(func() {
+		rootCmd.SetOut(nil)
+		rootCmd.SetErr(nil)
+		rootCmd.SetArgs(nil)
+	})
 
-	// This reference ensures the test won't compile until updateCmd exists.
-	// Plan 03-04 adds updateCmd to rootCmd in cmd/update.go.
-	_ = updateCmd
+	_ = updateCmd // compile check — requires cmd/update.go to exist
 
 	_ = rootCmd.Execute()
 
@@ -57,6 +54,9 @@ func TestUpdateCmd_JSON(t *testing.T) {
 	if _, ok := result["latest"]; !ok {
 		t.Errorf("JSON output missing 'latest' key: %s", out)
 	}
+	if updated, _ := result["updated"].(bool); updated {
+		t.Errorf("expected updated=false when versions match, got true")
+	}
 }
 
 // TestUpdateCmd_Help verifies that `dtasks update --help` succeeds and mentions "Check for".
@@ -65,6 +65,11 @@ func TestUpdateCmd_Help(t *testing.T) {
 	rootCmd.SetOut(&buf)
 	rootCmd.SetErr(&buf)
 	rootCmd.SetArgs([]string{"update", "--help"})
+	t.Cleanup(func() {
+		rootCmd.SetOut(nil)
+		rootCmd.SetErr(nil)
+		rootCmd.SetArgs(nil)
+	})
 
 	_ = updateCmd // compile check — requires cmd/update.go to exist
 
@@ -73,5 +78,62 @@ func TestUpdateCmd_Help(t *testing.T) {
 	}
 	if !strings.Contains(buf.String(), "Check for") {
 		t.Errorf("--help output should contain 'Check for', got:\n%s", buf.String())
+	}
+}
+
+// TestUpdateCmd_AlreadyUpToDate verifies that when current == latest, updated is false.
+func TestUpdateCmd_AlreadyUpToDate(t *testing.T) {
+	cases := []struct {
+		name    string
+		current string
+		latest  string
+	}{
+		{"same without v prefix", "0.3.0", "v0.3.0"},
+		{"same with v prefix current", "v0.3.0", "v0.3.0"},
+		{"same both without v", "0.3.0", "0.3.0"},
+	}
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"tag_name":"v0.3.0"}`))
+	}))
+	t.Cleanup(srv.Close)
+
+	origBase := updater.GHAPIBase
+	updater.GHAPIBase = srv.URL
+	t.Cleanup(func() { updater.GHAPIBase = origBase })
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			origVersion := rootCmd.Version
+			rootCmd.Version = tc.current
+			t.Cleanup(func() { rootCmd.Version = origVersion })
+
+			// Reset any lingering --help flag state from a previous test.
+			if f := updateCmd.Flags().Lookup("help"); f != nil {
+				_ = f.Value.Set("false")
+			}
+
+			var buf bytes.Buffer
+			rootCmd.SetOut(&buf)
+			rootCmd.SetErr(&buf)
+			rootCmd.SetArgs([]string{"update", "--json"})
+			t.Cleanup(func() {
+				rootCmd.SetOut(nil)
+				rootCmd.SetErr(nil)
+				rootCmd.SetArgs(nil)
+			})
+
+			_ = rootCmd.Execute()
+
+			out := buf.String()
+			var result map[string]interface{}
+			if err := json.Unmarshal([]byte(out), &result); err != nil {
+				t.Fatalf("output is not valid JSON: %v\noutput: %s", err, out)
+			}
+			if updated, _ := result["updated"].(bool); updated {
+				t.Errorf("expected updated=false for current=%q latest=v0.3.0, got true", tc.current)
+			}
+		})
 	}
 }

@@ -3,10 +3,10 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
-	"github.com/danielmrdev/dtasks-cli/internal/output"
 	"github.com/danielmrdev/dtasks-cli/internal/skill"
 	"github.com/danielmrdev/dtasks-cli/internal/updater"
 	skilldata "github.com/danielmrdev/dtasks-cli/skills/dtasks-cli"
@@ -25,6 +25,13 @@ var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Check for and install updates from GitHub releases",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		w := cmd.OutOrStdout()
+		useJSON, _ := cmd.Flags().GetBool("json")
+		if !useJSON {
+			// Fall back to the persistent flag registered on rootCmd.
+			useJSON, _ = rootCmd.PersistentFlags().GetBool("json")
+		}
+
 		current := strings.TrimPrefix(rootCmd.Version, "v")
 
 		latestTag, err := updater.FetchLatestVersion("danielmrdev/dtasks-cli")
@@ -41,7 +48,7 @@ var updateCmd = &cobra.Command{
 		if current == latest {
 			result.Updated = false
 			result.Message = "already up to date"
-			return emitUpdateResult(result)
+			return emitUpdateResult(w, result, useJSON)
 		}
 
 		asset, err := updater.AssetName()
@@ -58,35 +65,35 @@ var updateCmd = &cobra.Command{
 		if err := updater.DownloadAndReplace(assetURL, exePath); err != nil {
 			result.Updated = false
 			result.Message = fmt.Sprintf("update failed: %s", err)
-			if output.JSONMode {
-				return json.NewEncoder(os.Stdout).Encode(result)
+			if useJSON {
+				return json.NewEncoder(w).Encode(result)
 			}
 			return err
 		}
 
 		homeDir, err := os.UserHomeDir()
 		if err == nil {
-			if skillErr := skill.PromptAndInstall(homeDir, skilldata.Content, os.Stdin, os.Stdout); skillErr != nil {
-				fmt.Fprintln(os.Stderr, "warning: skill install:", skillErr)
+			if skillErr := skill.PromptAndInstall(homeDir, skilldata.Content, os.Stdin, w); skillErr != nil {
+				fmt.Fprintln(cmd.ErrOrStderr(), "warning: skill install:", skillErr)
 			}
 		}
 
-		fmt.Fprintln(os.Stdout, "Run install.sh to update shell completions")
+		fmt.Fprintln(w, "Run install.sh to update shell completions")
 
 		result.Updated = true
 		result.Message = fmt.Sprintf("updated to v%s", latest)
-		return emitUpdateResult(result)
+		return emitUpdateResult(w, result, useJSON)
 	},
 }
 
-func emitUpdateResult(r UpdateResult) error {
-	if output.JSONMode {
-		return json.NewEncoder(os.Stdout).Encode(r)
+func emitUpdateResult(w io.Writer, r UpdateResult, useJSON bool) error {
+	if useJSON {
+		return json.NewEncoder(w).Encode(r)
 	}
 	if r.Updated {
-		fmt.Fprintln(os.Stdout, r.Message)
+		fmt.Fprintln(w, r.Message)
 	} else {
-		fmt.Fprintf(os.Stdout, "Already up to date (%s)\n", r.Current)
+		fmt.Fprintf(w, "Already up to date (%s)\n", r.Current)
 	}
 	return nil
 }
