@@ -7,9 +7,11 @@ Brownfield project at v0.2.0. This milestone adds task querying (filters, sortin
 ## Phases
 
 - [x] **Phase 1: Querying** - Filters, sorting, and keyword search for task listing (completed 2026-03-06)
-- [ ] **Phase 2: Richness** - Task priorities, bulk maintenance, and usage stats (gap closure in progress)
+- [x] **Phase 2: Richness** - Task priorities, bulk maintenance, and usage stats (completed 2026-03-06)
 - [x] **Phase 3: Tooling** - Self-update, shell completions setup, and skill auto-install (completed 2026-03-06)
 - [x] **Phase 4: Release** - Feature branch, CI validation, tag v0.3.0, and publish release assets (completed 2026-03-06)
+- [ ] **Phase 5: Polish** - Fix --sort help text discoverability gap (gap closure)
+- [ ] **Phase 6: Skill Install** - Add skill auto-install to first-install path via install.sh (gap closure)
 
 ## Phase Details
 
@@ -78,11 +80,34 @@ Plans:
 - [ ] 04-01-PLAN.md — Commit pending fixes, push branch, open PR to main
 - [ ] 04-02-PLAN.md — CI gate, merge to main, tag v0.3.0, confirm release assets
 
+### Phase 5: Polish
+**Goal**: Fix --sort flag help text to advertise "priority" as a valid sort field
+**Depends on**: Phase 4
+**Requirements**: SORT-01, PRIO-04
+**Gap Closure**: Closes `sort-help-text` integration gap from v0.3 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. `dtasks task ls --help` shows "Sort by: due, created, completed, priority"
+  2. Existing tests pass; shell completion still returns "priority" as a valid value
+**Plans**: TBD
+
+### Phase 6: Skill Install
+**Goal**: Offer skill auto-install consent prompt during fresh install via install.sh
+**Depends on**: Phase 5
+**Requirements**: SKIL-01, SKIL-02, SKIL-03, SKIL-04
+**Gap Closure**: Closes `skill-first-install-path` integration gap from v0.3 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. After `install.sh` installs the binary, it runs `dtasks install-skill` (or equivalent) to offer skill consent
+  2. On a non-TTY install, skill install is skipped gracefully (same non-TTY behavior as update path)
+  3. All existing SKIL-01..04 tests still pass; install.sh `bash -n` syntax check passes
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Querying | 3/3 | Complete   | 2026-03-06 |
-| 2. Richness | 4/5 | Gap closure | - |
+| 2. Richness | 5/5 | Complete   | 2026-03-06 |
 | 3. Tooling | 5/5 | Complete   | 2026-03-06 |
 | 4. Release | 2/2 | Complete    | 2026-03-06 |
+| 5. Polish | 0/? | Not started | - |
+| 6. Skill Install | 0/? | Not started | - |

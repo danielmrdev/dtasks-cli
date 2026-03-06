@@ -97,7 +97,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FILT-02 | Phase 1 | Complete |
 | FILT-03 | Phase 1 | Complete |
 | FILT-04 | Phase 1 | Complete |
-| SORT-01 | Phase 1 | Complete |
+| SORT-01 | Phase 1 + Phase 5 (help text) | Complete |
 | SORT-02 | Phase 1 | Complete |
 | SRCH-01 | Phase 1 | Complete |
 | SRCH-02 | Phase 1 | Complete |
@@ -105,7 +105,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PRIO-01 | Phase 2 | Complete |
 | PRIO-02 | Phase 2 | Complete |
 | PRIO-03 | Phase 2 | Complete |
-| PRIO-04 | Phase 2 | Complete |
+| PRIO-04 | Phase 2 + Phase 5 (help text) | Complete |
 | MAINT-01 | Phase 2 | Complete |
 | MAINT-02 | Phase 2 | Complete |
 | MAINT-03 | Phase 2 | Complete |
@@ -121,10 +121,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COMP-02 | Phase 3 | Complete |
 | COMP-03 | Phase 3 | Complete |
 | COMP-04 | Phase 3 | Complete |
-| SKIL-01 | Phase 3 | Complete |
-| SKIL-02 | Phase 3 | Complete |
-| SKIL-03 | Phase 3 | Complete |
-| SKIL-04 | Phase 3 | Complete |
+| SKIL-01 | Phase 3 + Phase 6 (first-install) | Complete |
+| SKIL-02 | Phase 3 + Phase 6 (first-install) | Complete |
+| SKIL-03 | Phase 3 + Phase 6 (first-install) | Complete |
+| SKIL-04 | Phase 3 + Phase 6 (first-install) | Complete |
 
 **Coverage:**
 - v1 requirements: 32 total
