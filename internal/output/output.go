@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/danielmrdev/dtasks-cli/internal/models"
+	"github.com/danielmrdev/dtasks-cli/internal/repo"
 	"github.com/mattn/go-runewidth"
 )
 
@@ -62,7 +63,7 @@ func PrintTasks(tasks []models.Task) {
 		return
 	}
 
-	headers := []string{"ID", "LIST", "TITLE", "DUE", "✔", "AC"}
+	headers := []string{"ID", "LIST", "TITLE", "DUE", "PRIO", "✔", "AC"}
 	var plain, styled [][]string
 	for _, t := range tasks {
 		done := " "
@@ -85,8 +86,17 @@ func PrintTasks(tasks []models.Task) {
 			plainList = "● " + t.ListName
 			styledList = colorDot(*t.ListColor) + " " + t.ListName
 		}
-		plain = append(plain, []string{id, plainList, title, due, done, ac})
-		styled = append(styled, []string{id, styledList, title, due, done, ac})
+		prio := " "
+		switch {
+		case t.Priority != nil && *t.Priority == "high":
+			prio = "!"
+		case t.Priority != nil && *t.Priority == "medium":
+			prio = "~"
+		case t.Priority != nil && *t.Priority == "low":
+			prio = "-"
+		}
+		plain = append(plain, []string{id, plainList, title, due, prio, done, ac})
+		styled = append(styled, []string{id, styledList, title, due, prio, done, ac})
 	}
 	printBorderedTable(headers, plain, styled)
 }
@@ -124,6 +134,10 @@ func PrintTask(t *models.Task) {
 	if t.Autocomplete {
 		fmt.Printf("  Autocomplete: ✓\n")
 	}
+	if t.Priority != nil && *t.Priority != "" {
+		prioSymbol := map[string]string{"high": "!", "medium": "~", "low": "-"}[*t.Priority]
+		fmt.Printf("  Priority    : %s (%s)\n", prioSymbol, *t.Priority)
+	}
 	if t.Recurring {
 		fmt.Printf("  Recurring   : %s\n", formatRecur(t))
 	}
@@ -144,6 +158,40 @@ func PrintError(msg string) {
 		return
 	}
 	fmt.Fprintln(os.Stderr, "Error: "+msg)
+}
+
+func PrintDeletedCount(n int) {
+	if JSONMode {
+		printJSON(map[string]any{"deleted": n})
+		return
+	}
+	fmt.Printf("Deleted %d task(s).\n", n)
+}
+
+func PrintStats(s *repo.StatsSummary) {
+	if JSONMode {
+		printJSON(s)
+		return
+	}
+	fmt.Printf("Total: %d  Pending: %d  Done: %d  (%.1f%% complete)\n",
+		s.Total, s.Pending, s.Done, s.PctDone)
+	if len(s.ByList) == 0 {
+		fmt.Println("No lists found.")
+		return
+	}
+	headers := []string{"LIST", "Total", "Pending", "Done", "Done%"}
+	var rows [][]string
+	for _, ls := range s.ByList {
+		pct := fmt.Sprintf("%.1f%%", ls.PctDone)
+		rows = append(rows, []string{
+			ls.ListName,
+			strconv.Itoa(ls.Total),
+			strconv.Itoa(ls.Pending),
+			strconv.Itoa(ls.Done),
+			pct,
+		})
+	}
+	printBorderedTable(headers, rows, rows)
 }
 
 // --- Table renderer ---

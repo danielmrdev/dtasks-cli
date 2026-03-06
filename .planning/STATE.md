@@ -1,0 +1,122 @@
+---
+gsd_state_version: 1.0
+milestone: v0.3
+milestone_name: milestone
+status: planning
+stopped_at: Completed 04-release-01-PLAN.md
+last_updated: "2026-03-06T14:27:46.586Z"
+last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
+progress:
+  total_phases: 4
+  completed_phases: 3
+  total_plans: 15
+  completed_plans: 14
+  percent: 33
+---
+
+# Project State
+
+## Project Reference
+
+See: .planning/PROJECT.md (updated 2026-03-06)
+
+**Core value:** Tasks are always reachable from the terminal with a single fast command — no UI, no login, no overhead.
+**Current focus:** Phase 1 — Querying
+
+## Current Position
+
+Phase: 1 of 4 (Querying)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
+
+Progress: [███░░░░░░░] 33%
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 0
+- Average duration: -
+- Total execution time: -
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
+
+**Recent Trend:**
+- Last 5 plans: -
+- Trend: -
+
+*Updated after each plan completion*
+| Phase 01-querying P01 | 2 | 1 tasks | 1 files |
+| Phase 01-querying P02 | 2 | 2 tasks | 2 files |
+| Phase 01-querying P03 | 2 | 2 tasks | 3 files |
+| Phase 02-richness P01 | 2 | 1 tasks | 2 files |
+| Phase 02-richness P02 | 4min | 2 tasks | 4 files |
+| Phase 02-richness P03 | 2min | 2 tasks | 1 files |
+| Phase 02-richness P04 | 8min | 2 tasks | 3 files |
+| Phase 02-richness P05 | 8min | 2 tasks | 3 files |
+| Phase 03-tooling P01 | 2min | 3 tasks | 7 files |
+| Phase 03-tooling P02 | 1min | 2 tasks | 1 files |
+| Phase 03-tooling P03 | 2 | 2 tasks | 1 files |
+| Phase 03-tooling P04 | 8min | 2 tasks | 6 files |
+| Phase 03-tooling P05 | 10min | 2 tasks | 2 files |
+| Phase 04-release P01 | 5min | 2 tasks | 2 files |
+
+## Accumulated Context
+
+### Decisions
+
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- Project: One milestone (v0.3.0) for all 9 issues — cohesive feature layer
+- Project: 4 phases: querying → richness → tooling → release
+- Project: Feature branch workflow — PR to main, then tag for CI release automation
+- [Phase 01-querying]: SRCH-03 invalid regex asserts err != nil and tasks == nil (nil slice, not empty)
+- [Phase 01-querying]: FILT-04 week range is [today, today+6] inclusive — 7 days starting from today
+- [Phase 01-querying]: Regex mode compiles opts.Keyword directly without wrapping with (?i) — user controls the full regexp pattern
+- [Phase 01-querying]: taskSelectSQL const has no ORDER BY — TaskList appends dynamically, TaskGet uses as-is for single-row
+- [Phase 01-querying]: --due-today flag replaced by --today (pre-release, no backward compat needed)
+- [Phase 01-querying]: findCmd uses cobra.ExactArgs(1) — keyword is positional, matching dtasks find <keyword> UX
+- [Phase 02-richness]: [Phase 02-richness]: Use direct SQL UPDATE for completed_at in delete-completed tests — TaskDone uses datetime('now') which is uncontrollable in tests
+- [Phase 02-richness]: [Phase 02-richness]: Empty string Priority patch signals clear-to-nil — consistent with DueDate/Notes/Color clear semantics
+- [Phase 02-richness]: ListStats = ListStat type alias to satisfy test references without renaming canonical type
+- [Phase 02-richness]: TaskDeleteCompleted fetches rows first (SELECT), then DELETEs — enables DryRun without separate query path
+- [Phase 02-richness]: PrintStats column headers match test assertions: Total/Pending/Done/Done% (mixed case)
+- [Phase 02-richness]: output package imports repo for StatsSummary parameter type — render-only leaf, no circular dependency
+- [Phase 02-richness]: Two-step bulk delete: DryRun:true preview then DryRun:false execute — confirmation prompt before destructive operation
+- [Phase 02-richness]: statsCmd is flat (no subcommands) — JSON via global --json flag
+- [Phase 02-richness]: BoolVar for --completed: no date argument needed — flag alone signals bulk-delete-all
+- [Phase 02-richness]: Before='' means no date filter: zero-value semantics, no sentinel constant needed
+- [Phase 03-tooling]: ghAPIBase unexported var in updater package allows test injection without exported setter
+- [Phase 03-tooling]: cmd/update_test.go uses //go:build ignore until Plan 03-04 creates updateCmd to avoid compile errors
+- [Phase 03-tooling]: golang.org/x/term added as direct dependency for TTY detection in PromptAndInstall
+- [Phase 03-tooling]: DownloadAndReplace uses filepath.Dir(exePath) for temp dir — avoids cross-device rename failure
+- [Phase 03-tooling]: io.Copy streams download to temp file — no io.ReadAll buffering, safe for large binaries
+- [Phase 03-tooling]: Non-TTY path in PromptAndInstall installs directly without prompting (programmatic install path for updateCmd)
+- [Phase 03-tooling]: TTY detection via interface{ Fd() uintptr } type assertion on io.Reader, using golang.org/x/term.IsTerminal
+- [Phase 03-tooling]: PromptAndInstall returns nil (graceful skip) when Claude not detected or user declines — no error on skip
+- [Phase 03-tooling]: GHAPIBase exported (was ghAPIBase) to allow cross-package test injection without reflection
+- [Phase 03-tooling]: skilldata wrapper package in skills/dtasks-cli/ — Go //go:embed prohibits .. path traversal
+- [Phase 03-tooling]: cmd.OutOrStdout() for updateCmd — os.Stdout bypasses Cobra SetOut in tests
+- [Phase 03-tooling]: PersistentPreRunE skips DB init for update command — works on fresh installs with no config
+- [Phase 03-tooling]: install_completions() uses the just-installed binary path (not bare dtasks) to generate completions — ensures correct binary is used before PATH is updated
+- [Phase 03-tooling]: POSIX [ -t 0 ] TTY check skips completions in non-interactive environments (CI/pipe) — idempotent install.ps1 append guards against duplicate profile entries on upgrade
+- [Phase 04-release]: Committed fix(rm) and chore(planning) as separate commits; PR #19 open against main; tag deferred until merge
+
+### Pending Todos
+
+None yet.
+
+### Blockers/Concerns
+
+None yet.
+
+## Session Continuity
+
+Last session: 2026-03-06T14:27:46.584Z
+Stopped at: Completed 04-release-01-PLAN.md
+Resume file: None

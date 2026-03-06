@@ -32,5 +32,6 @@ type Task struct {
 	RecurEndsAfter  *int       `json:"recur_ends_after,omitempty"`
 	RecurCount      int        `json:"recur_count,omitempty"`
 	Autocomplete    bool       `json:"autocomplete"`
+	Priority        *string    `json:"priority,omitempty"`
 	CreatedAt       time.Time  `json:"created_at"`
 }

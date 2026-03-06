@@ -104,6 +104,15 @@ func migrate(db *sql.DB) error {
 		}
 	}
 
+	// Add priority column if missing (existing DBs)
+	var pCount int
+	db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('tasks') WHERE name='priority'`).Scan(&pCount)
+	if pCount == 0 {
+		if _, err := db.Exec(`ALTER TABLE tasks ADD COLUMN priority TEXT`); err != nil {
+			return fmt.Errorf("migrate priority column: %w", err)
+		}
+	}
+
 	// Drop recur_time column if still present (removed in favour of inheriting due_time)
 	var rcCount int
 	db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('tasks') WHERE name='recur_time'`).Scan(&rcCount)

@@ -75,3 +75,21 @@ if ($userPath -notlike "*$installDir*") {
     Write-Host "$installDir added to your PATH."
     Write-Host "Restart your terminal for the change to take effect."
 }
+
+# ── Shell completions ─────────────────────────────────────────────────────────
+if ($Host.UI.RawUI -ne $null -and [System.Environment]::UserInteractive) {
+    $answer = Read-Host "Install PowerShell completions? [y/N]"
+    if ($answer -match "^[Yy]") {
+        if (-not (Test-Path $PROFILE)) {
+            New-Item -ItemType File -Path $PROFILE -Force | Out-Null
+        }
+        $completionLine = "`n# dtasks shell completion`n& `"$dest`" completion powershell | Out-String | Invoke-Expression"
+        $profileContent = Get-Content $PROFILE -Raw -ErrorAction SilentlyContinue
+        if ($profileContent -notlike "*dtasks completion*") {
+            Add-Content -Path $PROFILE -Value $completionLine
+            Write-Host "PowerShell completions added to $PROFILE"
+        } else {
+            Write-Host "PowerShell completions already in $PROFILE"
+        }
+    }
+}
