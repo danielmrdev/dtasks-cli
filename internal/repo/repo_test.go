@@ -1065,11 +1065,11 @@ func TestTaskSearch_Regex(t *testing.T) {
 		t.Errorf("expected nil tasks for invalid regex, got %v", tasks)
 	}
 
-	tasks, err = repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "(?i)grocery", Regex: true})
+	tasks, err = repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "(?i)groceri", Regex: true})
 	if err != nil {
 		t.Fatalf("TaskSearch() error = %v", err)
 	}
 	if len(tasks) != 1 {
-		t.Errorf("expected 1 match for '(?i)grocery', got %d", len(tasks))
+		t.Errorf("expected 1 match for '(?i)groceri', got %d", len(tasks))
 	}
 }

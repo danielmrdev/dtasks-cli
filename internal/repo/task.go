@@ -3,6 +3,8 @@ package repo
 import (
 	"database/sql"
 	"fmt"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/danielmrdev/dtasks-cli/internal/models"
@@ -40,11 +42,16 @@ func TaskGet(db *sql.DB, id int64) (*models.Task, error) {
 
 // TaskList returns tasks filtered by options.
 type TaskListOptions struct {
-	ListID    *int64
-	ParentID  *int64
-	OnlyRoot  bool // no subtasks
-	Completed *bool
-	DueToday  bool
+	ListID      *int64
+	ParentID    *int64
+	OnlyRoot    bool // no subtasks
+	Completed   *bool
+	DueToday    bool
+	Overdue     bool
+	DueTomorrow bool
+	DueWeek     bool
+	SortBy      string // "due" | "created" | "completed"
+	Reverse     bool
 }
 
 func TaskList(db *sql.DB, opts TaskListOptions) ([]models.Task, error) {
@@ -75,8 +82,36 @@ func TaskList(db *sql.DB, opts TaskListOptions) ([]models.Task, error) {
 		query += ` AND t.due_date <= ?`
 		args = append(args, today)
 	}
+	if opts.Overdue {
+		today := time.Now().Format("2006-01-02")
+		query += ` AND t.due_date < ?`
+		args = append(args, today)
+	}
+	if opts.DueTomorrow {
+		tomorrow := time.Now().AddDate(0, 0, 1).Format("2006-01-02")
+		query += ` AND t.due_date = ?`
+		args = append(args, tomorrow)
+	}
+	if opts.DueWeek {
+		today := time.Now().Format("2006-01-02")
+		week := time.Now().AddDate(0, 0, 6).Format("2006-01-02")
+		query += ` AND t.due_date >= ? AND t.due_date <= ?`
+		args = append(args, today, week)
+	}
 
-	query += ` ORDER BY t.due_date ASC, t.due_time ASC, t.created_at ASC`
+	sortMap := map[string]string{
+		"due":       "t.due_date ASC, t.due_time ASC, t.created_at ASC",
+		"created":   "t.created_at ASC",
+		"completed": "t.completed_at ASC",
+	}
+	orderExpr, ok := sortMap[opts.SortBy]
+	if !ok {
+		orderExpr = "t.due_date ASC, t.due_time ASC, t.created_at ASC"
+	}
+	if opts.Reverse {
+		orderExpr = strings.ReplaceAll(orderExpr, " ASC", " DESC")
+	}
+	query += " ORDER BY " + orderExpr
 
 	rows, err := db.Query(query, args...)
 	if err != nil {
@@ -93,6 +128,65 @@ func TaskList(db *sql.DB, opts TaskListOptions) ([]models.Task, error) {
 		tasks = append(tasks, *t)
 	}
 	return tasks, rows.Err()
+}
+
+type TaskSearchOptions struct {
+	Keyword string
+	ListID  *int64
+	Regex   bool
+}
+
+func TaskSearch(db *sql.DB, opts TaskSearchOptions) ([]models.Task, error) {
+	query := taskSelectSQL + ` WHERE 1=1`
+	args := []any{}
+
+	if opts.ListID != nil {
+		query += ` AND t.list_id = ?`
+		args = append(args, *opts.ListID)
+	}
+
+	if !opts.Regex && opts.Keyword != "" {
+		pattern := "%" + opts.Keyword + "%"
+		query += ` AND (t.title LIKE ? OR t.notes LIKE ?)`
+		args = append(args, pattern, pattern)
+	}
+
+	query += ` ORDER BY t.due_date ASC, t.created_at ASC`
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tasks []models.Task
+	for rows.Next() {
+		t, err := scanTaskRow(rows)
+		if err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, *t)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if opts.Regex {
+		re, err := regexp.Compile(opts.Keyword)
+		if err != nil {
+			return nil, fmt.Errorf("invalid regex: %w", err)
+		}
+		var matched []models.Task
+		for _, t := range tasks {
+			notesMatch := t.Notes != nil && re.MatchString(*t.Notes)
+			if re.MatchString(t.Title) || notesMatch {
+				matched = append(matched, t)
+			}
+		}
+		return matched, nil
+	}
+
+	return tasks, nil
 }
 
 func TaskUpdate(db *sql.DB, id int64, in TaskInput) (*models.Task, error) {
