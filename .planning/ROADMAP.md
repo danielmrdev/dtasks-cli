@@ -88,7 +88,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. `dtasks task ls --help` shows "Sort by: due, created, completed, priority"
   2. Existing tests pass; shell completion still returns "priority" as a valid value
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 05-01-PLAN.md — Fix --sort flag usage string in cmd/task.go
 
 ### Phase 6: Skill Install
 **Goal**: Offer skill auto-install consent prompt during fresh install via install.sh
@@ -109,5 +112,5 @@ Plans:
 | 2. Richness | 5/5 | Complete   | 2026-03-06 |
 | 3. Tooling | 5/5 | Complete   | 2026-03-06 |
 | 4. Release | 2/2 | Complete    | 2026-03-06 |
-| 5. Polish | 0/? | Not started | - |
+| 5. Polish | 0/1 | Not started | - |
 | 6. Skill Install | 0/? | Not started | - |
