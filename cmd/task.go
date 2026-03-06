@@ -146,7 +146,7 @@ func init() {
 	lsCmd.Flags().BoolVar(&lsOverdue, "overdue", false, "Tasks past their due date")
 	lsCmd.Flags().BoolVar(&lsTomorrow, "tomorrow", false, "Tasks due tomorrow")
 	lsCmd.Flags().BoolVar(&lsWeek, "week", false, "Tasks due within the next 7 days")
-	lsCmd.Flags().StringVar(&lsSort, "sort", "", "Sort by: due, created, completed")
+	lsCmd.Flags().StringVar(&lsSort, "sort", "", "Sort by: due, created, completed, priority")
 	lsCmd.Flags().BoolVar(&lsReverse, "reverse", false, "Reverse sort order")
 	_ = lsCmd.RegisterFlagCompletionFunc("list", completeLists)
 	_ = lsCmd.RegisterFlagCompletionFunc("sort", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
