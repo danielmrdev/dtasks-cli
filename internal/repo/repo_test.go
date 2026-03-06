@@ -815,3 +815,261 @@ func TestAutocomplete_DueTimePassed(t *testing.T) {
 		t.Error("expected task to be completed (due_time already passed)")
 	}
 }
+
+// --- Phase 1 Querying tests ---
+
+func TestTaskList_FilterToday(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	today := time.Now().Format("2006-01-02")
+	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+	tomorrow := time.Now().AddDate(0, 0, 1).Format("2006-01-02")
+
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "due today", DueDate: &today})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "due yesterday (overdue)", DueDate: &yesterday})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "due tomorrow"})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "due tomorrow explicit", DueDate: &tomorrow})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "no due date"})
+
+	tasks, err := repo.TaskList(d, repo.TaskListOptions{DueToday: true})
+	if err != nil {
+		t.Fatalf("TaskList() error = %v", err)
+	}
+	if len(tasks) != 2 {
+		t.Errorf("expected 2 tasks (today + overdue), got %d", len(tasks))
+	}
+	for _, task := range tasks {
+		if task.DueDate == nil || *task.DueDate > today {
+			t.Errorf("unexpected task in FilterToday results: %q (due=%v)", task.Title, task.DueDate)
+		}
+	}
+}
+
+func TestTaskList_FilterOverdue(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+	today := time.Now().Format("2006-01-02")
+
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "overdue", DueDate: &yesterday})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "due today — not overdue", DueDate: &today})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "no due date"})
+
+	tasks, err := repo.TaskList(d, repo.TaskListOptions{Overdue: true})
+	if err != nil {
+		t.Fatalf("TaskList() error = %v", err)
+	}
+	if len(tasks) != 1 {
+		t.Errorf("expected 1 overdue task, got %d", len(tasks))
+	}
+	if tasks[0].Title != "overdue" {
+		t.Errorf("expected Title=%q, got %q", "overdue", tasks[0].Title)
+	}
+}
+
+func TestTaskList_FilterTomorrow(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	today := time.Now().Format("2006-01-02")
+	tomorrow := time.Now().AddDate(0, 0, 1).Format("2006-01-02")
+	dayAfter := time.Now().AddDate(0, 0, 2).Format("2006-01-02")
+
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "tomorrow", DueDate: &tomorrow})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "today", DueDate: &today})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "day after tomorrow", DueDate: &dayAfter})
+
+	tasks, err := repo.TaskList(d, repo.TaskListOptions{DueTomorrow: true})
+	if err != nil {
+		t.Fatalf("TaskList() error = %v", err)
+	}
+	if len(tasks) != 1 {
+		t.Errorf("expected 1 task due tomorrow, got %d", len(tasks))
+	}
+	if tasks[0].Title != "tomorrow" {
+		t.Errorf("expected Title=%q, got %q", "tomorrow", tasks[0].Title)
+	}
+}
+
+func TestTaskList_FilterWeek(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	today := time.Now().Format("2006-01-02")
+	in6days := time.Now().AddDate(0, 0, 6).Format("2006-01-02")
+	in7days := time.Now().AddDate(0, 0, 7).Format("2006-01-02")
+	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "today", DueDate: &today})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "in 6 days", DueDate: &in6days})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "in 7 days — out of range", DueDate: &in7days})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "yesterday — out of range", DueDate: &yesterday})
+
+	tasks, err := repo.TaskList(d, repo.TaskListOptions{DueWeek: true})
+	if err != nil {
+		t.Fatalf("TaskList() error = %v", err)
+	}
+	if len(tasks) != 2 {
+		t.Errorf("expected 2 tasks in week range [today, today+6], got %d", len(tasks))
+	}
+}
+
+func TestTaskList_Sort(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	d1 := "2026-03-10"
+	d2 := "2026-03-05"
+	d3 := "2026-03-20"
+
+	t1, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Due March 10", DueDate: &d1})
+	t2, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Due March 5", DueDate: &d2})
+	t3, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Due March 20", DueDate: &d3})
+
+	tasks, err := repo.TaskList(d, repo.TaskListOptions{SortBy: "due"})
+	if err != nil {
+		t.Fatalf("TaskList() error = %v", err)
+	}
+	if len(tasks) != 3 {
+		t.Fatalf("expected 3 tasks, got %d", len(tasks))
+	}
+	if tasks[0].ID != t2.ID || tasks[1].ID != t1.ID || tasks[2].ID != t3.ID {
+		t.Errorf("expected sort order [March5, March10, March20], got IDs [%d, %d, %d]",
+			tasks[0].ID, tasks[1].ID, tasks[2].ID)
+	}
+
+	tasksByCreated, err := repo.TaskList(d, repo.TaskListOptions{SortBy: "created"})
+	if err != nil {
+		t.Fatalf("TaskList() error = %v", err)
+	}
+	if tasksByCreated[0].ID != t1.ID || tasksByCreated[1].ID != t2.ID || tasksByCreated[2].ID != t3.ID {
+		t.Errorf("expected creation order [t1, t2, t3], got IDs [%d, %d, %d]",
+			tasksByCreated[0].ID, tasksByCreated[1].ID, tasksByCreated[2].ID)
+	}
+}
+
+func TestTaskList_SortReverse(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	d1 := "2026-03-10"
+	d2 := "2026-03-05"
+	d3 := "2026-03-20"
+
+	t1, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Due March 10", DueDate: &d1})
+	t2, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Due March 5", DueDate: &d2})
+	t3, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Due March 20", DueDate: &d3})
+
+	tasks, err := repo.TaskList(d, repo.TaskListOptions{SortBy: "due", Reverse: true})
+	if err != nil {
+		t.Fatalf("TaskList() error = %v", err)
+	}
+	if len(tasks) != 3 {
+		t.Fatalf("expected 3 tasks, got %d", len(tasks))
+	}
+	if tasks[0].ID != t3.ID || tasks[1].ID != t1.ID || tasks[2].ID != t2.ID {
+		t.Errorf("expected reverse due order [March20, March10, March5], got IDs [%d, %d, %d]",
+			tasks[0].ID, tasks[1].ID, tasks[2].ID)
+	}
+}
+
+func TestTaskSearch_Keyword(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	notes := "call the doctor"
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Buy groceries"})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Gym session", Notes: &notes})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "gym"})
+
+	tasks, err := repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "grocer"})
+	if err != nil {
+		t.Fatalf("TaskSearch() error = %v", err)
+	}
+	if len(tasks) != 1 {
+		t.Errorf("expected 1 match for 'grocer', got %d", len(tasks))
+	}
+	if tasks[0].Title != "Buy groceries" {
+		t.Errorf("expected Title=%q, got %q", "Buy groceries", tasks[0].Title)
+	}
+
+	tasks, err = repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "DOCTOR"})
+	if err != nil {
+		t.Fatalf("TaskSearch() error = %v", err)
+	}
+	if len(tasks) != 1 {
+		t.Errorf("expected 1 match for 'DOCTOR' in notes, got %d", len(tasks))
+	}
+
+	tasks, err = repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "shopping"})
+	if err != nil {
+		t.Fatalf("TaskSearch() error = %v", err)
+	}
+	if len(tasks) != 0 {
+		t.Errorf("expected 0 matches for 'shopping', got %d", len(tasks))
+	}
+}
+
+func TestTaskSearch_List(t *testing.T) {
+	d := openTestDB(t)
+	lA, _ := repo.ListCreate(d, "ListA", nil)
+	lB, _ := repo.ListCreate(d, "ListB", nil)
+
+	repo.TaskCreate(d, repo.TaskInput{ListID: lA.ID, Title: "Task in A"})
+	repo.TaskCreate(d, repo.TaskInput{ListID: lA.ID, Title: "Another in A"})
+	repo.TaskCreate(d, repo.TaskInput{ListID: lB.ID, Title: "Task in B"})
+
+	tasks, err := repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "Task", ListID: &lA.ID})
+	if err != nil {
+		t.Fatalf("TaskSearch() error = %v", err)
+	}
+	if len(tasks) != 1 {
+		t.Errorf("expected 1 task in ListA matching 'Task', got %d", len(tasks))
+	}
+	if tasks[0].ListID != lA.ID {
+		t.Errorf("expected ListID=%d, got %d", lA.ID, tasks[0].ListID)
+	}
+
+	allTasks, err := repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "Task"})
+	if err != nil {
+		t.Fatalf("TaskSearch() error = %v", err)
+	}
+	if len(allTasks) != 2 {
+		t.Errorf("expected 2 tasks matching 'Task' across all lists, got %d", len(allTasks))
+	}
+}
+
+func TestTaskSearch_Regex(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Buy groceries"})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Buy milk"})
+	repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Sell house"})
+
+	tasks, err := repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "^Buy", Regex: true})
+	if err != nil {
+		t.Fatalf("TaskSearch() error = %v", err)
+	}
+	if len(tasks) != 2 {
+		t.Errorf("expected 2 tasks matching '^Buy', got %d", len(tasks))
+	}
+
+	tasks, err = repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "[invalid", Regex: true})
+	if err == nil {
+		t.Error("expected error for invalid regex, got nil")
+	}
+	if tasks != nil {
+		t.Errorf("expected nil tasks for invalid regex, got %v", tasks)
+	}
+
+	tasks, err = repo.TaskSearch(d, repo.TaskSearchOptions{Keyword: "(?i)grocery", Regex: true})
+	if err != nil {
+		t.Fatalf("TaskSearch() error = %v", err)
+	}
+	if len(tasks) != 1 {
+		t.Errorf("expected 1 match for '(?i)grocery', got %d", len(tasks))
+	}
+}
