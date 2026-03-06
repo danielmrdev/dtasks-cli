@@ -36,7 +36,7 @@ Requirements for v0.3.0 release. Each maps to a roadmap phase.
 
 - [x] **MAINT-01**: User can bulk-delete completed tasks on or before a date with `rm --completed <date>`
 - [x] **MAINT-02**: User can preview what would be deleted without committing with `rm --completed <date> --dry-run`
-- [ ] **MAINT-03**: Bulk delete requires explicit confirmation unless `--yes` is passed
+- [x] **MAINT-03**: Bulk delete requires explicit confirmation unless `--yes` is passed
 - [x] **MAINT-04**: Bulk delete respects `--json` flag (emits `{"deleted": N}`)
 - [x] **MAINT-05**: Bulk delete can be scoped to a specific list with `--list <id>`
 
@@ -108,7 +108,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PRIO-04 | Phase 2 | Complete |
 | MAINT-01 | Phase 2 | Complete |
 | MAINT-02 | Phase 2 | Complete |
-| MAINT-03 | Phase 2 | Pending |
+| MAINT-03 | Phase 2 | Complete |
 | MAINT-04 | Phase 2 | Complete |
 | MAINT-05 | Phase 2 | Complete |
 | STAT-01 | Phase 2 | Complete |
