@@ -1,3 +1,19 @@
+---
+gsd_state_version: 1.0
+milestone: v0.3
+milestone_name: milestone
+status: planning
+stopped_at: Completed 01-querying-01-PLAN.md
+last_updated: "2026-03-06T00:01:53.316Z"
+last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
+progress:
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 3
+  completed_plans: 1
+  percent: 33
+---
+
 # Project State
 
 ## Project Reference
@@ -14,7 +30,7 @@ Plan: 0 of ? in current phase
 Status: Ready to plan
 Last activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -34,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01-querying P01 | 2 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -45,6 +62,8 @@ Recent decisions affecting current work:
 - Project: One milestone (v0.3.0) for all 9 issues — cohesive feature layer
 - Project: 4 phases: querying → richness → tooling → release
 - Project: Feature branch workflow — PR to main, then tag for CI release automation
+- [Phase 01-querying]: SRCH-03 invalid regex asserts err != nil and tasks == nil (nil slice, not empty)
+- [Phase 01-querying]: FILT-04 week range is [today, today+6] inclusive — 7 days starting from today
 
 ### Pending Todos
 
@@ -56,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06
-Stopped at: Roadmap and STATE initialized. No plans created yet.
+Last session: 2026-03-06T00:01:53.313Z
+Stopped at: Completed 01-querying-01-PLAN.md
 Resume file: None

@@ -9,21 +9,21 @@ Requirements for v0.3.0 release. Each maps to a roadmap phase.
 
 ### Filters
 
-- [ ] **FILT-01**: User can list tasks due today or earlier with `ls --today`
-- [ ] **FILT-02**: User can list tasks past their due date with `ls --overdue`
-- [ ] **FILT-03**: User can list tasks due tomorrow with `ls --tomorrow`
-- [ ] **FILT-04**: User can list tasks due within the next 7 days with `ls --week`
+- [x] **FILT-01**: User can list tasks due today or earlier with `ls --today`
+- [x] **FILT-02**: User can list tasks past their due date with `ls --overdue`
+- [x] **FILT-03**: User can list tasks due tomorrow with `ls --tomorrow`
+- [x] **FILT-04**: User can list tasks due within the next 7 days with `ls --week`
 
 ### Sorting
 
-- [ ] **SORT-01**: User can sort task listing by due date, priority, created, or completed with `ls --sort=<field>`
-- [ ] **SORT-02**: User can reverse the sort order with `ls --reverse`
+- [x] **SORT-01**: User can sort task listing by due date, priority, created, or completed with `ls --sort=<field>`
+- [x] **SORT-02**: User can reverse the sort order with `ls --reverse`
 
 ### Search
 
-- [ ] **SRCH-01**: User can search tasks by keyword across title and notes with `dtasks find <keyword>` (case-insensitive)
-- [ ] **SRCH-02**: User can scope search to a specific list with `find --list <id>`
-- [ ] **SRCH-03**: User can search with a regex pattern with `find --regex`
+- [x] **SRCH-01**: User can search tasks by keyword across title and notes with `dtasks find <keyword>` (case-insensitive)
+- [x] **SRCH-02**: User can scope search to a specific list with `find --list <id>`
+- [x] **SRCH-03**: User can search with a regex pattern with `find --regex`
 
 ### Priority
 
@@ -93,15 +93,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FILT-01 | Phase 1 | Pending |
-| FILT-02 | Phase 1 | Pending |
-| FILT-03 | Phase 1 | Pending |
-| FILT-04 | Phase 1 | Pending |
-| SORT-01 | Phase 1 | Pending |
-| SORT-02 | Phase 1 | Pending |
-| SRCH-01 | Phase 1 | Pending |
-| SRCH-02 | Phase 1 | Pending |
-| SRCH-03 | Phase 1 | Pending |
+| FILT-01 | Phase 1 | Complete |
+| FILT-02 | Phase 1 | Complete |
+| FILT-03 | Phase 1 | Complete |
+| FILT-04 | Phase 1 | Complete |
+| SORT-01 | Phase 1 | Complete |
+| SORT-02 | Phase 1 | Complete |
+| SRCH-01 | Phase 1 | Complete |
+| SRCH-02 | Phase 1 | Complete |
+| SRCH-03 | Phase 1 | Complete |
 | PRIO-01 | Phase 2 | Pending |
 | PRIO-02 | Phase 2 | Pending |
 | PRIO-03 | Phase 2 | Pending |
