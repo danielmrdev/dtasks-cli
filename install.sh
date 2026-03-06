@@ -101,3 +101,49 @@ case ":${PATH}:" in
     echo "  export PATH=\"\$PATH:${install_dir}\""
     ;;
 esac
+
+# ── Shell completions ─────────────────────────────────────────────────────────
+install_completions() {
+    # Skip in non-interactive (pipe/CI) environments
+    [ -t 0 ] || return 0
+
+    # Detect shell from $SHELL env var
+    shell_name="$(basename "${SHELL:-}")"
+    if [ -z "$shell_name" ]; then
+        return 0
+    fi
+
+    printf "Install shell completions for %s? [y/N] " "$shell_name"
+    read -r answer
+    case "$answer" in
+        [Yy]*) ;;
+        *) return 0 ;;
+    esac
+
+    case "$shell_name" in
+        bash)
+            comp_dir="${HOME}/.local/share/bash-completion/completions"
+            mkdir -p "$comp_dir"
+            "${install_dir}/${BINARY}" completion bash > "${comp_dir}/${BINARY}"
+            echo "Completions installed for bash: ${comp_dir}/${BINARY}"
+            ;;
+        zsh)
+            comp_dir="${HOME}/.zsh/completions"
+            mkdir -p "$comp_dir"
+            "${install_dir}/${BINARY}" completion zsh > "${comp_dir}/_${BINARY}"
+            echo "Completions installed for zsh: ${comp_dir}/_${BINARY}"
+            echo "Ensure your ~/.zshrc contains: fpath=(~/.zsh/completions \$fpath) && autoload -U compinit && compinit"
+            ;;
+        fish)
+            comp_dir="${HOME}/.config/fish/completions"
+            mkdir -p "$comp_dir"
+            "${install_dir}/${BINARY}" completion fish > "${comp_dir}/${BINARY}.fish"
+            echo "Completions installed for fish: ${comp_dir}/${BINARY}.fish"
+            ;;
+        *)
+            echo "Shell '${shell_name}' not supported for auto-install. Run 'dtasks completion --help' to install manually."
+            ;;
+    esac
+}
+
+install_completions
