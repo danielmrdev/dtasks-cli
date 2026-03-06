@@ -1277,6 +1277,47 @@ func TestTaskDeleteCompleted_Scoped(t *testing.T) {
 	}
 }
 
+// TestTaskDeleteCompleted_NoBefore — MAINT-04
+func TestTaskDeleteCompleted_NoBefore(t *testing.T) {
+	d := openTestDB(t)
+	l, _ := repo.ListCreate(d, "Test", nil)
+
+	t1, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Done task A"})
+	t2, _ := repo.TaskCreate(d, repo.TaskInput{ListID: l.ID, Title: "Done task B"})
+
+	d.Exec(`UPDATE tasks SET completed = 1, completed_at = ? WHERE id = ?`, "2026-02-15T10:00:00Z", t1.ID)
+	d.Exec(`UPDATE tasks SET completed = 1, completed_at = ? WHERE id = ?`, "2025-06-01T10:00:00Z", t2.ID)
+
+	// DryRun:true — must return tasks without deleting
+	dryResult, err := repo.TaskDeleteCompleted(d, repo.DeleteCompletedOptions{DryRun: true})
+	if err != nil {
+		t.Fatalf("TaskDeleteCompleted() dry run no-before error = %v", err)
+	}
+	if dryResult.Deleted != 0 {
+		t.Errorf("expected Deleted=0 in dry run, got %d", dryResult.Deleted)
+	}
+	if len(dryResult.Tasks) != 2 {
+		t.Errorf("expected Tasks len=2 in dry run, got %d", len(dryResult.Tasks))
+	}
+
+	// DryRun:false — must delete all completed tasks regardless of date
+	result, err := repo.TaskDeleteCompleted(d, repo.DeleteCompletedOptions{})
+	if err != nil {
+		t.Fatalf("TaskDeleteCompleted() no-before error = %v", err)
+	}
+	if result.Deleted != 2 {
+		t.Errorf("expected Deleted=2, got %d", result.Deleted)
+	}
+
+	// Tasks must no longer exist
+	remaining, _ := repo.TaskList(d, repo.TaskListOptions{ListID: &l.ID})
+	for _, task := range remaining {
+		if task.Completed {
+			t.Errorf("expected no completed tasks remaining, found task %d", task.ID)
+		}
+	}
+}
+
 // TestTaskStats — STAT-01
 func TestTaskStats(t *testing.T) {
 	d := openTestDB(t)
