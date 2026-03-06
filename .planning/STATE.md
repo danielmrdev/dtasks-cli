@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-querying-01-PLAN.md
-last_updated: "2026-03-06T00:01:53.316Z"
+stopped_at: Completed 01-querying-02-PLAN.md
+last_updated: "2026-03-06T00:06:55.203Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 33
 ---
 
@@ -51,6 +51,7 @@ Progress: [███░░░░░░░] 33%
 
 *Updated after each plan completion*
 | Phase 01-querying P01 | 2 | 1 tasks | 1 files |
+| Phase 01-querying P02 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,8 @@ Recent decisions affecting current work:
 - Project: Feature branch workflow — PR to main, then tag for CI release automation
 - [Phase 01-querying]: SRCH-03 invalid regex asserts err != nil and tasks == nil (nil slice, not empty)
 - [Phase 01-querying]: FILT-04 week range is [today, today+6] inclusive — 7 days starting from today
+- [Phase 01-querying]: Regex mode compiles opts.Keyword directly without wrapping with (?i) — user controls the full regexp pattern
+- [Phase 01-querying]: taskSelectSQL const has no ORDER BY — TaskList appends dynamically, TaskGet uses as-is for single-row
 
 ### Pending Todos
 
@@ -75,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T00:01:53.313Z
-Stopped at: Completed 01-querying-01-PLAN.md
+Last session: 2026-03-06T00:06:55.201Z
+Stopped at: Completed 01-querying-02-PLAN.md
 Resume file: None
