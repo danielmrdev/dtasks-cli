@@ -313,7 +313,7 @@ var undoneCmd = &cobra.Command{
 // --- rm ---
 
 var (
-	rmCompleted string
+	rmCompleted bool
 	rmDryRun    bool
 	rmYes       bool
 	rmListID    int64
@@ -335,7 +335,6 @@ var rmCmd = &cobra.Command{
 			// Never set DryRun:rmDryRun here — that would execute the DELETE before the
 			// confirmation prompt runs, bypassing MAINT-03.
 			opts := repo.DeleteCompletedOptions{
-				Before: rmCompleted,
 				DryRun: true,
 			}
 			if cmd.Flags().Changed("list") {
@@ -396,7 +395,7 @@ var rmCmd = &cobra.Command{
 }
 
 func init() {
-	rmCmd.Flags().StringVar(&rmCompleted, "completed", "", "Bulk-delete completed tasks on or before YYYY-MM-DD")
+	rmCmd.Flags().BoolVar(&rmCompleted, "completed", false, "Bulk-delete all completed tasks")
 	rmCmd.Flags().BoolVar(&rmDryRun, "dry-run", false, "Preview without deleting")
 	rmCmd.Flags().BoolVar(&rmYes, "yes", false, "Skip confirmation prompt")
 	rmCmd.Flags().Int64VarP(&rmListID, "list", "l", 0, "Scope bulk delete to list ID")
