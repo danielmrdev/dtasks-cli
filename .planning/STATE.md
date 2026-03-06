@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 04-release-02-PLAN.md
-last_updated: "2026-03-06T14:44:59.199Z"
+stopped_at: Completed 05-polish-01-PLAN.md
+last_updated: "2026-03-06T22:41:07.733Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
+  total_phases: 6
+  completed_phases: 5
+  total_plans: 16
+  completed_plans: 16
   percent: 33
 ---
 
@@ -65,6 +65,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 03-tooling P05 | 10min | 2 tasks | 2 files |
 | Phase 04-release P01 | 5min | 2 tasks | 2 files |
 | Phase 04-release P02 | 15min | 4 tasks | 0 files |
+| Phase 05-polish P01 | 1min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,7 @@ Recent decisions affecting current work:
 - [Phase 04-release]: Committed fix(rm) and chore(planning) as separate commits; PR #19 open against main; tag deferred until merge
 - [Phase 04-release]: Squash merge strategy for PR #19 — clean linear history on main
 - [Phase 04-release]: release.yml triggered by tag push (v*.*.*) — no manual artifact upload needed
+- [Phase 05-polish]: Pre-existing test failure (TestAutocomplete_DueTimeNotYetPassed) is out of scope for plan 05-01 — documented in deferred-items.md
 
 ### Pending Todos
 
@@ -120,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T14:42:26.872Z
-Stopped at: Completed 04-release-02-PLAN.md
+Last session: 2026-03-06T22:41:07.731Z
+Stopped at: Completed 05-polish-01-PLAN.md
 Resume file: None

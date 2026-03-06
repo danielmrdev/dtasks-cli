@@ -10,7 +10,7 @@ Brownfield project at v0.2.0. This milestone adds task querying (filters, sortin
 - [x] **Phase 2: Richness** - Task priorities, bulk maintenance, and usage stats (completed 2026-03-06)
 - [x] **Phase 3: Tooling** - Self-update, shell completions setup, and skill auto-install (completed 2026-03-06)
 - [x] **Phase 4: Release** - Feature branch, CI validation, tag v0.3.0, and publish release assets (completed 2026-03-06)
-- [ ] **Phase 5: Polish** - Fix --sort help text discoverability gap (gap closure)
+- [x] **Phase 5: Polish** - Fix --sort help text discoverability gap (gap closure) (completed 2026-03-06)
 - [ ] **Phase 6: Skill Install** - Add skill auto-install to first-install path via install.sh (gap closure)
 
 ## Phase Details
@@ -112,5 +112,5 @@ Plans:
 | 2. Richness | 5/5 | Complete   | 2026-03-06 |
 | 3. Tooling | 5/5 | Complete   | 2026-03-06 |
 | 4. Release | 2/2 | Complete    | 2026-03-06 |
-| 5. Polish | 0/1 | Not started | - |
+| 5. Polish | 1/1 | Complete   | 2026-03-06 |
 | 6. Skill Install | 0/? | Not started | - |
