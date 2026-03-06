@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-querying-02-PLAN.md
-last_updated: "2026-03-06T00:06:55.203Z"
+stopped_at: Completed 01-querying-03-PLAN.md
+last_updated: "2026-03-06T00:10:32.880Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 33
 ---
 
@@ -52,6 +52,7 @@ Progress: [███░░░░░░░] 33%
 *Updated after each plan completion*
 | Phase 01-querying P01 | 2 | 1 tasks | 1 files |
 | Phase 01-querying P02 | 2 | 2 tasks | 2 files |
+| Phase 01-querying P03 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ Recent decisions affecting current work:
 - [Phase 01-querying]: FILT-04 week range is [today, today+6] inclusive — 7 days starting from today
 - [Phase 01-querying]: Regex mode compiles opts.Keyword directly without wrapping with (?i) — user controls the full regexp pattern
 - [Phase 01-querying]: taskSelectSQL const has no ORDER BY — TaskList appends dynamically, TaskGet uses as-is for single-row
+- [Phase 01-querying]: --due-today flag replaced by --today (pre-release, no backward compat needed)
+- [Phase 01-querying]: findCmd uses cobra.ExactArgs(1) — keyword is positional, matching dtasks find <keyword> UX
 
 ### Pending Todos
 
@@ -78,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T00:06:55.201Z
-Stopped at: Completed 01-querying-02-PLAN.md
+Last session: 2026-03-06T00:10:32.878Z
+Stopped at: Completed 01-querying-03-PLAN.md
 Resume file: None

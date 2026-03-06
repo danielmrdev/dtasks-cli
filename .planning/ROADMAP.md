@@ -6,7 +6,7 @@ Brownfield project at v0.2.0. This milestone adds task querying (filters, sortin
 
 ## Phases
 
-- [ ] **Phase 1: Querying** - Filters, sorting, and keyword search for task listing
+- [x] **Phase 1: Querying** - Filters, sorting, and keyword search for task listing (completed 2026-03-06)
 - [ ] **Phase 2: Richness** - Task priorities, bulk maintenance, and usage stats
 - [ ] **Phase 3: Tooling** - Self-update, shell completions setup, and skill auto-install
 - [ ] **Phase 4: Release** - Feature branch, CI validation, tag v0.3.0, and publish release assets
@@ -64,7 +64,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Querying | 2/3 | In Progress|  |
+| 1. Querying | 3/3 | Complete   | 2026-03-06 |
 | 2. Richness | 0/? | Not started | - |
 | 3. Tooling | 0/? | Not started | - |
 | 4. Release | 0/? | Not started | - |
