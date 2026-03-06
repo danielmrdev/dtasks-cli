@@ -83,6 +83,7 @@ func init() {
 	rootCmd.AddCommand(rmCmd)
 	rootCmd.AddCommand(recurCmd)
 	rootCmd.AddCommand(findCmd)
+	rootCmd.AddCommand(statsCmd)
 }
 
 func Execute(version string) {
