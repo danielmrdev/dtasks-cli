@@ -16,7 +16,7 @@ Requirements for v0.3.0 release. Each maps to a roadmap phase.
 
 ### Sorting
 
-- [x] **SORT-01**: User can sort task listing by due date, priority, created, or completed with `ls --sort=<field>`
+- [x] **SORT-01**: User can sort task listing by due date, created, or completed with `ls --sort=<field>` (priority sort covered by PRIO-04 in Phase 2)
 - [x] **SORT-02**: User can reverse the sort order with `ls --reverse`
 
 ### Search

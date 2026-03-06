@@ -19,7 +19,7 @@ Brownfield project at v0.2.0. This milestone adds task querying (filters, sortin
 **Requirements**: FILT-01, FILT-02, FILT-03, FILT-04, SORT-01, SORT-02, SRCH-01, SRCH-02, SRCH-03
 **Success Criteria** (what must be TRUE):
   1. User can run `dtasks task ls --today`, `--overdue`, `--tomorrow`, `--week` and receive only tasks matching the time filter
-  2. User can run `dtasks task ls --sort=due` (and `priority`, `created`, `completed`) and see tasks ordered accordingly; `--reverse` inverts the order
+  2. User can run `dtasks task ls --sort=due` (and `created`, `completed`) and see tasks ordered accordingly; `--reverse` inverts the order (`--sort=priority` in Phase 2)
   3. User can run `dtasks find <keyword>` and receive all tasks whose title or notes contain the keyword (case-insensitive)
   4. User can scope `find` to a specific list with `--list <id>` and search with a regex pattern with `--regex`
 **Plans**: 3 plans
