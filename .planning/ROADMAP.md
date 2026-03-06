@@ -72,7 +72,11 @@ Plans:
   1. All Phase 1-3 work lands in a dedicated feature branch with a PR to main
   2. CI passes on the PR (tests, lint, build for all platforms)
   3. Merging to main and pushing tag v0.3.0 triggers GH Actions to publish release assets for all 6 platform targets
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Commit pending fixes, push branch, open PR to main
+- [ ] 04-02-PLAN.md — CI gate, merge to main, tag v0.3.0, confirm release assets
 
 ## Progress
 
@@ -81,4 +85,4 @@ Plans:
 | 1. Querying | 3/3 | Complete   | 2026-03-06 |
 | 2. Richness | 4/5 | Gap closure | - |
 | 3. Tooling | 5/5 | Complete   | 2026-03-06 |
-| 4. Release | 0/? | Not started | - |
+| 4. Release | 0/2 | Planned | - |
