@@ -82,6 +82,7 @@ func init() {
 	rootCmd.AddCommand(undoneCmd)
 	rootCmd.AddCommand(rmCmd)
 	rootCmd.AddCommand(recurCmd)
+	rootCmd.AddCommand(findCmd)
 }
 
 func Execute(version string) {
