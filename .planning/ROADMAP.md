@@ -7,7 +7,7 @@ Brownfield project at v0.2.0. This milestone adds task querying (filters, sortin
 ## Phases
 
 - [x] **Phase 1: Querying** - Filters, sorting, and keyword search for task listing (completed 2026-03-06)
-- [x] **Phase 2: Richness** - Task priorities, bulk maintenance, and usage stats (completed 2026-03-06)
+- [ ] **Phase 2: Richness** - Task priorities, bulk maintenance, and usage stats (gap closure in progress)
 - [ ] **Phase 3: Tooling** - Self-update, shell completions setup, and skill auto-install
 - [ ] **Phase 4: Release** - Feature branch, CI validation, tag v0.3.0, and publish release assets
 
@@ -36,15 +36,16 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can set `--priority high|medium|low` when adding or editing a task, and the priority is visible as a visual indicator in table output
   2. User can sort tasks by priority with `ls --sort=priority`
-  3. User can run `dtasks rm --completed <date>` to bulk-delete completed tasks; `--dry-run` previews without deleting; `--yes` skips confirmation; `--list <id>` scopes to one list
+  3. User can run `dtasks rm --completed` to bulk-delete all completed tasks; `--dry-run` previews without deleting; `--yes` skips confirmation; `--list <id>` scopes to one list
   4. User can run `dtasks stats` and see total, pending, done, and percentage per list; `--json` outputs structured JSON
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
 - [ ] 02-01-PLAN.md — TDD red phase: failing tests for all 11 Phase 2 requirements
 - [ ] 02-02-PLAN.md — Repo layer: schema migration, model extension, TaskDeleteCompleted, TaskStats
 - [ ] 02-03-PLAN.md — Output layer: PRIO column in PrintTasks, new PrintStats function
 - [ ] 02-04-PLAN.md — CLI layer: priority flags on add/edit, extended rmCmd, new statsCmd
+- [ ] 02-05-PLAN.md — Gap closure: fix --completed BoolVar and TaskDeleteCompleted no-date-cutoff path
 
 ### Phase 3: Tooling
 **Goal**: Users can update the binary in-place, install shell completions, and have the dtasks skill auto-installed for Claude
@@ -71,6 +72,6 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Querying | 3/3 | Complete   | 2026-03-06 |
-| 2. Richness | 4/4 | Complete   | 2026-03-06 |
+| 2. Richness | 4/5 | Gap closure | - |
 | 3. Tooling | 0/? | Not started | - |
 | 4. Release | 0/? | Not started | - |
