@@ -74,7 +74,12 @@ func init() {
 var (
 	lsListID   int64
 	lsAll      bool
-	lsDueToday bool
+	lsToday    bool
+	lsOverdue  bool
+	lsTomorrow bool
+	lsWeek     bool
+	lsSort     string
+	lsReverse  bool
 )
 
 var lsCmd = &cobra.Command{
@@ -87,8 +92,23 @@ var lsCmd = &cobra.Command{
 		if cmd.Flags().Changed("list") {
 			opts.ListID = &lsListID
 		}
-		if lsDueToday {
+		if lsToday {
 			opts.DueToday = true
+		}
+		if lsOverdue {
+			opts.Overdue = true
+		}
+		if lsTomorrow {
+			opts.DueTomorrow = true
+		}
+		if lsWeek {
+			opts.DueWeek = true
+		}
+		if cmd.Flags().Changed("sort") {
+			opts.SortBy = lsSort
+		}
+		if lsReverse {
+			opts.Reverse = true
 		}
 		if !lsAll {
 			f := false
@@ -107,8 +127,16 @@ var lsCmd = &cobra.Command{
 func init() {
 	lsCmd.Flags().Int64VarP(&lsListID, "list", "l", 0, "Filter by list ID")
 	lsCmd.Flags().BoolVar(&lsAll, "all", false, "Include completed tasks")
-	lsCmd.Flags().BoolVar(&lsDueToday, "due-today", false, "Only tasks due today or overdue")
+	lsCmd.Flags().BoolVar(&lsToday, "today", false, "Tasks due today or earlier")
+	lsCmd.Flags().BoolVar(&lsOverdue, "overdue", false, "Tasks past their due date")
+	lsCmd.Flags().BoolVar(&lsTomorrow, "tomorrow", false, "Tasks due tomorrow")
+	lsCmd.Flags().BoolVar(&lsWeek, "week", false, "Tasks due within the next 7 days")
+	lsCmd.Flags().StringVar(&lsSort, "sort", "", "Sort by: due, created, completed")
+	lsCmd.Flags().BoolVar(&lsReverse, "reverse", false, "Reverse sort order")
 	_ = lsCmd.RegisterFlagCompletionFunc("list", completeLists)
+	_ = lsCmd.RegisterFlagCompletionFunc("sort", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"due", "created", "completed"}, cobra.ShellCompDirectiveNoFileComp
+	})
 }
 
 // --- show ---
