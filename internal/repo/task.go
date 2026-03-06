@@ -354,7 +354,7 @@ SELECT
 	t.recurring, t.recur_type, t.recur_interval,
 	t.recur_day_of_week, t.recur_day_of_month,
 	t.recur_starts, t.recur_ends_type, t.recur_ends_date, t.recur_ends_after,
-	t.recur_count, t.autocomplete, t.created_at
+	t.recur_count, t.autocomplete, t.priority, t.created_at
 FROM tasks t
 JOIN lists l ON t.list_id = l.id
 `
@@ -378,7 +378,7 @@ func scanTaskRow(s scanner) (*models.Task, error) {
 		&t.Recurring, &t.RecurType, &t.RecurInterval,
 		&t.RecurDayOfWeek, &t.RecurDayOfMonth,
 		&t.RecurStarts, &t.RecurEndsType, &t.RecurEndsDate, &t.RecurEndsAfter,
-		&t.RecurCount, &t.Autocomplete, &t.CreatedAt,
+		&t.RecurCount, &t.Autocomplete, &t.Priority, &t.CreatedAt,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("scan task: %w", err)
