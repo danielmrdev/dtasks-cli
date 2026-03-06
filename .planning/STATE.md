@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 04-release-01-PLAN.md
-last_updated: "2026-03-06T14:27:46.586Z"
+stopped_at: Completed 04-release-02-PLAN.md
+last_updated: "2026-03-06T14:42:26.874Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 15
-  completed_plans: 14
+  completed_plans: 15
   percent: 33
 ---
 
@@ -64,6 +64,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 03-tooling P04 | 8min | 2 tasks | 6 files |
 | Phase 03-tooling P05 | 10min | 2 tasks | 2 files |
 | Phase 04-release P01 | 5min | 2 tasks | 2 files |
+| Phase 04-release P02 | 15min | 4 tasks | 0 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,8 @@ Recent decisions affecting current work:
 - [Phase 03-tooling]: install_completions() uses the just-installed binary path (not bare dtasks) to generate completions — ensures correct binary is used before PATH is updated
 - [Phase 03-tooling]: POSIX [ -t 0 ] TTY check skips completions in non-interactive environments (CI/pipe) — idempotent install.ps1 append guards against duplicate profile entries on upgrade
 - [Phase 04-release]: Committed fix(rm) and chore(planning) as separate commits; PR #19 open against main; tag deferred until merge
+- [Phase 04-release]: Squash merge strategy for PR #19 — clean linear history on main
+- [Phase 04-release]: release.yml triggered by tag push (v*.*.*) — no manual artifact upload needed
 
 ### Pending Todos
 
@@ -117,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T14:27:46.584Z
-Stopped at: Completed 04-release-01-PLAN.md
+Last session: 2026-03-06T14:42:26.872Z
+Stopped at: Completed 04-release-02-PLAN.md
 Resume file: None
