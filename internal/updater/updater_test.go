@@ -25,9 +25,9 @@ func newMockGHAPI(t *testing.T, tagName string) *httptest.Server {
 func TestFetchLatestVersion(t *testing.T) {
 	srv := newMockGHAPI(t, "v0.3.0")
 	// Override the API base URL so the function hits the mock server.
-	orig := ghAPIBase
-	ghAPIBase = srv.URL
-	t.Cleanup(func() { ghAPIBase = orig })
+	orig := GHAPIBase
+	GHAPIBase = srv.URL
+	t.Cleanup(func() { GHAPIBase = orig })
 
 	got, err := FetchLatestVersion("owner/repo")
 	if err != nil {
@@ -39,9 +39,9 @@ func TestFetchLatestVersion(t *testing.T) {
 }
 
 func TestFetchLatestVersion_NetworkError(t *testing.T) {
-	orig := ghAPIBase
-	ghAPIBase = "http://127.0.0.1:0" // nothing listening
-	t.Cleanup(func() { ghAPIBase = orig })
+	orig := GHAPIBase
+	GHAPIBase = "http://127.0.0.1:0" // nothing listening
+	t.Cleanup(func() { GHAPIBase = orig })
 
 	_, err := FetchLatestVersion("owner/repo")
 	if err == nil {

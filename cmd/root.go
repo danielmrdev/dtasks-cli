@@ -24,8 +24,8 @@ var rootCmd = &cobra.Command{
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		output.JSONMode = jsonFlag
 
-		// Skip DB init for the built-in completion script generator and help.
-		if isCompletionScript(cmd) || cmd.Name() == "help" {
+		// Skip DB init for the built-in completion script generator, help, and update.
+		if isCompletionScript(cmd) || cmd.Name() == "help" || cmd.Name() == "update" {
 			return nil
 		}
 
@@ -84,6 +84,7 @@ func init() {
 	rootCmd.AddCommand(recurCmd)
 	rootCmd.AddCommand(findCmd)
 	rootCmd.AddCommand(statsCmd)
+	rootCmd.AddCommand(updateCmd)
 }
 
 func Execute(version string) {

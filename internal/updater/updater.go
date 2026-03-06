@@ -11,14 +11,14 @@ import (
 	"runtime"
 )
 
-// ghAPIBase is the base URL for GitHub API requests.
-// Tests override this to point at a mock server.
-var ghAPIBase = "https://api.github.com"
+// GHAPIBase is the base URL for GitHub API requests.
+// Exported so tests in other packages (e.g. cmd) can override it without reflection.
+var GHAPIBase = "https://api.github.com"
 
 // FetchLatestVersion queries the GitHub Releases API for the latest tag of repo.
 // repo is in the form "owner/repository".
 func FetchLatestVersion(repo string) (string, error) {
-	url := fmt.Sprintf("%s/repos/%s/releases/latest", ghAPIBase, repo)
+	url := fmt.Sprintf("%s/repos/%s/releases/latest", GHAPIBase, repo)
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
 	if err != nil {
