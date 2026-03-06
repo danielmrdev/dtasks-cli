@@ -360,8 +360,15 @@ type DeleteCompletedResult struct {
 }
 
 func TaskDeleteCompleted(db *sql.DB, opts DeleteCompletedOptions) (DeleteCompletedResult, error) {
-	where := ` WHERE t.completed = 1 AND date(t.completed_at) <= ?`
-	args := []any{opts.Before}
+	var where string
+	var args []any
+	if opts.Before != "" {
+		where = ` WHERE t.completed = 1 AND date(t.completed_at) <= ?`
+		args = []any{opts.Before}
+	} else {
+		where = ` WHERE t.completed = 1`
+		args = []any{}
+	}
 	if opts.ListID != nil {
 		where += ` AND t.list_id = ?`
 		args = append(args, *opts.ListID)
@@ -385,8 +392,15 @@ func TaskDeleteCompleted(db *sql.DB, opts DeleteCompletedOptions) (DeleteComplet
 	if opts.DryRun {
 		return DeleteCompletedResult{Tasks: tasks, Deleted: 0}, nil
 	}
-	delWhere := ` WHERE completed = 1 AND date(completed_at) <= ?`
-	delArgs := []any{opts.Before}
+	var delWhere string
+	var delArgs []any
+	if opts.Before != "" {
+		delWhere = ` WHERE completed = 1 AND date(completed_at) <= ?`
+		delArgs = []any{opts.Before}
+	} else {
+		delWhere = ` WHERE completed = 1`
+		delArgs = []any{}
+	}
 	if opts.ListID != nil {
 		delWhere += ` AND list_id = ?`
 		delArgs = append(delArgs, *opts.ListID)
