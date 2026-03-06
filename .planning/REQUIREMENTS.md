@@ -47,10 +47,10 @@ Requirements for v0.3.0 release. Each maps to a roadmap phase.
 
 ### Self-update
 
-- [ ] **UPDT-01**: User can check for and install updates with `dtasks update`
-- [ ] **UPDT-02**: `dtasks update` shows current version and latest available
-- [ ] **UPDT-03**: `dtasks update` downloads and atomically replaces the running binary for the correct OS/arch
-- [ ] **UPDT-04**: `dtasks update` respects `--json` flag
+- [x] **UPDT-01**: User can check for and install updates with `dtasks update`
+- [x] **UPDT-02**: `dtasks update` shows current version and latest available
+- [x] **UPDT-03**: `dtasks update` downloads and atomically replaces the running binary for the correct OS/arch
+- [x] **UPDT-04**: `dtasks update` respects `--json` flag
 
 ### Install Completions
 
@@ -61,10 +61,10 @@ Requirements for v0.3.0 release. Each maps to a roadmap phase.
 
 ### Skill Auto-install
 
-- [ ] **SKIL-01**: On first run (or during install), the CLI detects whether Claude is installed (`~/.claude/` or `claude` command)
-- [ ] **SKIL-02**: User is prompted for consent before copying the skill
-- [ ] **SKIL-03**: Skill is copied to the correct platform path (`~/.claude/skills/dtasks-cli/`)
-- [ ] **SKIL-04**: If skill already exists it is overwritten silently; if platform not found, install is skipped gracefully
+- [x] **SKIL-01**: On first run (or during install), the CLI detects whether Claude is installed (`~/.claude/` or `claude` command)
+- [x] **SKIL-02**: User is prompted for consent before copying the skill
+- [x] **SKIL-03**: Skill is copied to the correct platform path (`~/.claude/skills/dtasks-cli/`)
+- [x] **SKIL-04**: If skill already exists it is overwritten silently; if platform not found, install is skipped gracefully
 
 ## v2 Requirements
 
@@ -113,18 +113,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MAINT-05 | Phase 2 | Complete |
 | STAT-01 | Phase 2 | Complete |
 | STAT-02 | Phase 2 | Complete |
-| UPDT-01 | Phase 3 | Pending |
-| UPDT-02 | Phase 3 | Pending |
-| UPDT-03 | Phase 3 | Pending |
-| UPDT-04 | Phase 3 | Pending |
+| UPDT-01 | Phase 3 | Complete |
+| UPDT-02 | Phase 3 | Complete |
+| UPDT-03 | Phase 3 | Complete |
+| UPDT-04 | Phase 3 | Complete |
 | COMP-01 | Phase 3 | Pending |
 | COMP-02 | Phase 3 | Pending |
 | COMP-03 | Phase 3 | Pending |
 | COMP-04 | Phase 3 | Pending |
-| SKIL-01 | Phase 3 | Pending |
-| SKIL-02 | Phase 3 | Pending |
-| SKIL-03 | Phase 3 | Pending |
-| SKIL-04 | Phase 3 | Pending |
+| SKIL-01 | Phase 3 | Complete |
+| SKIL-02 | Phase 3 | Complete |
+| SKIL-03 | Phase 3 | Complete |
+| SKIL-04 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 32 total

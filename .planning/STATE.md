@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 02-richness-05-PLAN.md
-last_updated: "2026-03-06T10:36:36.728Z"
+stopped_at: Completed 03-tooling-01-PLAN.md
+last_updated: "2026-03-06T12:17:36.299Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 13
+  completed_plans: 9
   percent: 33
 ---
 
@@ -58,6 +58,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 02-richness P03 | 2min | 2 tasks | 1 files |
 | Phase 02-richness P04 | 8min | 2 tasks | 3 files |
 | Phase 02-richness P05 | 8min | 2 tasks | 3 files |
+| Phase 03-tooling P01 | 2min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,9 @@ Recent decisions affecting current work:
 - [Phase 02-richness]: statsCmd is flat (no subcommands) — JSON via global --json flag
 - [Phase 02-richness]: BoolVar for --completed: no date argument needed — flag alone signals bulk-delete-all
 - [Phase 02-richness]: Before='' means no date filter: zero-value semantics, no sentinel constant needed
+- [Phase 03-tooling]: ghAPIBase unexported var in updater package allows test injection without exported setter
+- [Phase 03-tooling]: cmd/update_test.go uses //go:build ignore until Plan 03-04 creates updateCmd to avoid compile errors
+- [Phase 03-tooling]: golang.org/x/term added as direct dependency for TTY detection in PromptAndInstall
 
 ### Pending Todos
 
@@ -96,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T10:31:13.085Z
-Stopped at: Completed 02-richness-05-PLAN.md
+Last session: 2026-03-06T12:17:36.296Z
+Stopped at: Completed 03-tooling-01-PLAN.md
 Resume file: None
