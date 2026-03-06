@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 02-richness-04-PLAN.md
-last_updated: "2026-03-06T09:23:25.844Z"
+stopped_at: Completed 02-richness-05-PLAN.md
+last_updated: "2026-03-06T10:31:13.091Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 8
+  completed_plans: 8
   percent: 33
 ---
 
@@ -57,6 +57,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 02-richness P02 | 4min | 2 tasks | 4 files |
 | Phase 02-richness P03 | 2min | 2 tasks | 1 files |
 | Phase 02-richness P04 | 8min | 2 tasks | 3 files |
+| Phase 02-richness P05 | 8min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ Recent decisions affecting current work:
 - [Phase 02-richness]: output package imports repo for StatsSummary parameter type — render-only leaf, no circular dependency
 - [Phase 02-richness]: Two-step bulk delete: DryRun:true preview then DryRun:false execute — confirmation prompt before destructive operation
 - [Phase 02-richness]: statsCmd is flat (no subcommands) — JSON via global --json flag
+- [Phase 02-richness]: BoolVar for --completed: no date argument needed — flag alone signals bulk-delete-all
+- [Phase 02-richness]: Before='' means no date filter: zero-value semantics, no sentinel constant needed
 
 ### Pending Todos
 
@@ -93,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T09:19:47.082Z
-Stopped at: Completed 02-richness-04-PLAN.md
+Last session: 2026-03-06T10:31:13.085Z
+Stopped at: Completed 02-richness-05-PLAN.md
 Resume file: None
