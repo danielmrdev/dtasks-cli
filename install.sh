@@ -147,3 +147,13 @@ install_completions() {
 }
 
 install_completions
+
+# ── Skill auto-install ────────────────────────────────────────────────────────
+install_skill() {
+    # Skip in non-interactive (pipe/CI) environments
+    [ -t 0 ] || return 0
+
+    "${dest}" install-skill || true
+}
+
+install_skill
