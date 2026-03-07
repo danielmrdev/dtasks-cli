@@ -81,6 +81,46 @@ func TestUpdateCmd_Help(t *testing.T) {
 	}
 }
 
+// TestUpdateCmd_JSON_NoContamination verifies that `dtasks --json update` emits a single
+// valid JSON object with no plain-text prefix or suffix (no stdout contamination).
+func TestUpdateCmd_JSON_NoContamination(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"tag_name":"v0.3.0"}`))
+	}))
+	t.Cleanup(srv.Close)
+
+	origBase := updater.GHAPIBase
+	updater.GHAPIBase = srv.URL
+	t.Cleanup(func() { updater.GHAPIBase = origBase })
+
+	origVersion := rootCmd.Version
+	rootCmd.Version = "0.3.0"
+	t.Cleanup(func() { rootCmd.Version = origVersion })
+
+	var buf bytes.Buffer
+	rootCmd.SetOut(&buf)
+	rootCmd.SetErr(&buf)
+	rootCmd.SetArgs([]string{"update", "--json"})
+	t.Cleanup(func() {
+		rootCmd.SetOut(nil)
+		rootCmd.SetErr(nil)
+		rootCmd.SetArgs(nil)
+	})
+
+	_ = rootCmd.Execute()
+
+	out := buf.String()
+	trimmed := strings.TrimSpace(out)
+	if len(trimmed) == 0 || trimmed[0] != '{' {
+		t.Fatalf("output does not start with '{' (no plain-text contamination expected):\n%s", out)
+	}
+	var result map[string]interface{}
+	if err := json.Unmarshal([]byte(out), &result); err != nil {
+		t.Fatalf("output is not valid JSON: %v\noutput: %s", err, out)
+	}
+}
+
 // TestUpdateCmd_AlreadyUpToDate verifies that when current == latest, updated is false.
 func TestUpdateCmd_AlreadyUpToDate(t *testing.T) {
 	cases := []struct {
