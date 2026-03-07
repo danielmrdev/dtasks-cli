@@ -98,6 +98,11 @@ func TestUpdateCmd_JSON_NoContamination(t *testing.T) {
 	rootCmd.Version = "0.3.0"
 	t.Cleanup(func() { rootCmd.Version = origVersion })
 
+	// Reset any lingering --help flag state from a previous test.
+	if f := updateCmd.Flags().Lookup("help"); f != nil {
+		_ = f.Value.Set("false")
+	}
+
 	var buf bytes.Buffer
 	rootCmd.SetOut(&buf)
 	rootCmd.SetErr(&buf)
