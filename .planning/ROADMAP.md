@@ -119,7 +119,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md — Gate plain-text hint and PromptAndInstall on !useJSON; use output.JSONMode for flag read
+- [ ] 07-01-PLAN.md — Remove double flag-read, gate PromptAndInstall and hint on !output.JSONMode
 
 ## Progress
 
