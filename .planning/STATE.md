@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 06-skill-install-01-PLAN.md
-last_updated: "2026-03-07T14:57:50.621Z"
+stopped_at: Completed 07-json-update-fix-01-PLAN.md
+last_updated: "2026-03-07T16:02:30.790Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 17
-  completed_plans: 17
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 18
+  completed_plans: 18
   percent: 33
 ---
 
@@ -67,6 +67,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 04-release P02 | 15min | 4 tasks | 0 files |
 | Phase 05-polish P01 | 1min | 1 tasks | 1 files |
 | Phase 06-skill-install P01 | 1min | 3 tasks | 4 files |
+| Phase 07-json-update-fix P01 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,8 @@ Recent decisions affecting current work:
 - [Phase 06-skill-install]: install-skill uses os.Stdin (not cmd.InOrStdin()) so PromptAndInstall receives real TTY — consistent with updateCmd pattern
 - [Phase 06-skill-install]: Shell-level [ -t 0 ] guard in install_skill() is primary non-TTY gate; binary-level check is secondary
 - [Phase 06-skill-install]: No success message from RunE: PromptAndInstall handles all output via the passed io.Writer
+- [Phase 07-json-update-fix]: output.JSONMode is SSOT for updateCmd — no local flag-read in RunE
+- [Phase 07-json-update-fix]: emitUpdateResult signature unchanged (useJSON bool param) — out-of-scope refactor, minimal diff
 
 ### Pending Todos
 
@@ -126,6 +129,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-07T14:55:03.624Z
-Stopped at: Completed 06-skill-install-01-PLAN.md
+Last session: 2026-03-07T16:02:30.787Z
+Stopped at: Completed 07-json-update-fix-01-PLAN.md
 Resume file: None
