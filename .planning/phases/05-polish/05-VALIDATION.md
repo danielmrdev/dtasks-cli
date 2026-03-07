@@ -1,10 +1,11 @@
 ---
 phase: 5
 slug: polish
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-03-06
+audited: 2026-03-07
 ---
 
 # Phase 5 — Validation Strategy
@@ -38,7 +39,8 @@ created: 2026-03-06
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 5-01-01 | 01 | 1 | SORT-01, PRIO-04 | automated | `go test ./... -count=1 && dtasks task ls --help \| grep priority` | ✅ | ⬜ pending |
+| 5-01-01 | 01 | 1 | SORT-01 | automated | `go test ./cmd/... -run TestLsCmd_SortFlagIncludesPriority -count=1` | ✅ | ✅ green |
+| 5-01-01 | 01 | 1 | PRIO-04 | automated | `go test ./internal/repo/... -run TestTaskList_SortPriority -count=1` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -58,11 +60,21 @@ created: 2026-03-06
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 10s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 10s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** 2026-03-07
+
+---
+
+## Validation Audit 2026-03-07
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 1 |
+| Resolved | 1 |
+| Escalated | 0 |
