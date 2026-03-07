@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
 status: planning
-stopped_at: Completed 05-polish-01-PLAN.md
-last_updated: "2026-03-06T22:43:24.533Z"
+stopped_at: Completed 06-skill-install-01-PLAN.md
+last_updated: "2026-03-07T14:55:03.626Z"
 last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
 progress:
   total_phases: 6
-  completed_phases: 5
-  total_plans: 16
-  completed_plans: 16
+  completed_phases: 6
+  total_plans: 17
+  completed_plans: 17
   percent: 33
 ---
 
@@ -66,6 +66,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 04-release P01 | 5min | 2 tasks | 2 files |
 | Phase 04-release P02 | 15min | 4 tasks | 0 files |
 | Phase 05-polish P01 | 1min | 1 tasks | 1 files |
+| Phase 06-skill-install P01 | 1min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,9 @@ Recent decisions affecting current work:
 - [Phase 04-release]: Squash merge strategy for PR #19 — clean linear history on main
 - [Phase 04-release]: release.yml triggered by tag push (v*.*.*) — no manual artifact upload needed
 - [Phase 05-polish]: Pre-existing test failure (TestAutocomplete_DueTimeNotYetPassed) is out of scope for plan 05-01 — documented in deferred-items.md
+- [Phase 06-skill-install]: install-skill uses os.Stdin (not cmd.InOrStdin()) so PromptAndInstall receives real TTY — consistent with updateCmd pattern
+- [Phase 06-skill-install]: Shell-level [ -t 0 ] guard in install_skill() is primary non-TTY gate; binary-level check is secondary
+- [Phase 06-skill-install]: No success message from RunE: PromptAndInstall handles all output via the passed io.Writer
 
 ### Pending Todos
 
@@ -122,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T22:41:07.731Z
-Stopped at: Completed 05-polish-01-PLAN.md
+Last session: 2026-03-07T14:55:03.624Z
+Stopped at: Completed 06-skill-install-01-PLAN.md
 Resume file: None
