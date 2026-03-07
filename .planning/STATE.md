@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
 milestone: v0.3
-milestone_name: milestone
-status: planning
-stopped_at: Completed 07-json-update-fix-01-PLAN.md
-last_updated: "2026-03-07T16:04:42.584Z"
-last_activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
+milestone_name: Querying, Richness & Tooling
+status: complete
+stopped_at: Milestone v0.3 archived
+last_updated: "2026-03-07"
+last_activity: 2026-03-07 — v0.3 milestone complete, archived to .planning/milestones/
 progress:
   total_phases: 7
   completed_phases: 7
@@ -18,17 +18,16 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-06)
+See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Tasks are always reachable from the terminal with a single fast command — no UI, no login, no overhead.
-**Current focus:** Phase 1 — Querying
+**Current focus:** Planning next milestone — run `/gsd:new-milestone`
 
 ## Current Position
 
-Phase: 1 of 4 (Querying)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-06 — Roadmap created for v0.3.0 milestone
+Milestone v0.3 complete. All 7 phases shipped, archived to `.planning/milestones/`.
+Status: Ready for next milestone
+Last activity: 2026-03-07 — v0.3 milestone archived
 
 Progress: [███░░░░░░░] 33%
 

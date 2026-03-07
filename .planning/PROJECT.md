@@ -2,7 +2,7 @@
 
 ## What This Is
 
-CLI task manager written in Go. Single static binary, no runtime dependencies. SQLite as the database backend, designed to run on macOS, Linux, and Windows. The database path can point to a synced folder (Dropbox, iCloud Drive, Syncthing…) to share tasks across machines.
+CLI task manager written in Go. Single static binary, no runtime dependencies. SQLite as the database backend, designed to run on macOS, Linux, and Windows. The database path can point to a synced folder (Dropbox, iCloud Drive, Syncthing…) to share tasks across machines. Ships with self-update, shell completions, and Claude skill auto-install.
 
 ## Core Value
 
@@ -20,45 +20,57 @@ Tasks are always reachable from the terminal with a single fast command — no U
 - ✓ Table and JSON output — existing
 - ✓ Cross-platform config and DB paths — existing
 - ✓ Shell completions (cobra-generated) — existing
-- ✓ `--due-today` filter — existing
+- ✓ Essential filters: `--today`, `--overdue`, `--tomorrow`, `--week` — v0.3
+- ✓ Sorting: `--sort=due|created|completed|priority`, `--reverse` — v0.3
+- ✓ Keyword search: `dtasks find <keyword>`, `--list`, `--regex` — v0.3
+- ✓ Task priorities: high/medium/low, visual indicator, sort by priority — v0.3
+- ✓ Bulk delete completed tasks: `dtasks task rm --completed`, `--dry-run`, `--yes` — v0.3
+- ✓ Stats command: `dtasks stats` with totals, pending, done, % by list — v0.3
+- ✓ Self-update: `dtasks update` fetches latest GitHub release and replaces binary atomically — v0.3
+- ✓ Shell completions setup during install/update: interactive prompt, shell auto-detection — v0.3
+- ✓ Claude skill auto-install on first run and via `install-skill` command — v0.3
 
 ### Active
 
-- [ ] Essential filters: --overdue, --today, --tomorrow, --week (issue #13)
-- [ ] Sorting options for task listing: --sort=due|priority|created|completed, --reverse (issue #14)
-- [ ] Search tasks by keyword: `dtasks find <keyword>`, --list, --regex (issue #15)
-- [ ] Task priorities: high/medium/low field, visual indicator, sort by priority (issue #17)
-- [ ] Bulk delete completed tasks: `dtasks rm --completed <date>`, --dry-run, --yes (issue #9)
-- [ ] Stats command: `dtasks stats` with totals, pending, done, % by list (issue #16)
-- [ ] Self-update command: `dtasks update` fetches latest GitHub release and replaces binary (issue #7)
-- [ ] Shell completions setup during install/update: interactive prompt, shell auto-detection (issue #12)
-- [ ] Auto-install dtasks skill to Claude/Codex/OpenCode on first run (issue #18)
+(None — all scoped requirements shipped in v0.3)
 
 ### Out of Scope
 
 - System notifications — high complexity, not core value
-- Sync / cloud backend — out of v0.3.0 scope
-- Tags, priorities (beyond #17 scope) — deferred
-- Mobile app — web-first or CLI-first
+- Sync / cloud backend — out of current scope
+- Tags / labels — deferred until priority UX is validated in production
+- Mobile app — CLI-first
 
 ## Context
 
-Brownfield project at v0.2.0. Codebase fully mapped in `.planning/codebase/`. All 9 open GitHub issues tracked and scoped for v0.3.0. Release flow: feature branch → PR to main → tag v0.3.0 → GitHub Actions CI builds and publishes release assets.
+Shipped v0.3.0 with 2,797 LOC Go (production). Tech stack: Go, modernc.org/sqlite (CGO_ENABLED=0), Cobra, golang.org/x/term. Release pipeline: GitHub Actions triggered by tag push, produces 6 platform binaries.
+
+Known tech debt:
+- COMP-04: shell completions are hint-only after `update` (not re-installed automatically)
+- `TaskUpdate` in repo/task.go does not persist `Priority` in SQL UPDATE — no regression, but confusing
+- Pre-existing scheduler tests with hardcoded dates fail intermittently (out of scope)
 
 ## Constraints
 
 - **Tech stack**: Go, modernc.org/sqlite (CGO_ENABLED=0), Cobra — no new runtime dependencies unless strictly necessary
 - **Binary**: Must remain a single static binary for all platforms (macOS arm64/amd64, Linux amd64/arm64, Windows amd64/arm64)
 - **CI**: Release triggered by git tag push (GH Actions already configured)
-- **Branch strategy**: Work on feature branch, PR to main, tag v0.3.0 after merge
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| One milestone (v0.3.0) for all 9 issues | Issues are cohesive and form a natural feature layer | — Pending |
-| 3 phases: querying → richness → tooling | Dependencies flow cleanly; querying needed before sort/filter UX | — Pending |
-| Feature branch workflow | PR to main + tag for CI release automation | — Pending |
+| One milestone (v0.3.0) for all 9 issues | Issues are cohesive and form a natural feature layer | ✓ Good — clean shipping unit |
+| 3 core phases: querying → richness → tooling | Dependencies flow cleanly; querying needed before sort/filter UX | ✓ Good — no rework needed |
+| Feature branch workflow | PR to main + tag for CI release automation | ✓ Good — clean linear history on main |
+| TDD red phase for every implementation phase | Forces contract definition before implementation, catches interface mismatches early | ✓ Good — caught several interface issues upfront |
+| Dynamic ORDER BY builder in TaskList | Append WHERE/ORDER BY at runtime; base const has no ORDER BY clause | ✓ Good — flexible, testable |
+| Dual-mode search (SQL LIKE + Go regexp) | SQL LIKE for keyword mode, post-fetch Go regexp for regex mode | ✓ Good — avoids SQLite REGEXP extension dependency |
+| DryRun pattern: fetch rows first, skip DELETE if DryRun=true | Enables preview without separate query path | ✓ Good — single code path for preview and execute |
+| skilldata wrapper package to embed SKILL.md | Go `//go:embed` prohibits `..` path traversal | ✓ Good — clean workaround |
+| output.JSONMode as SSOT for updateCmd | Avoids double flag-read, single source of truth for JSON mode | ✓ Good — fixed contamination bug |
+| Squash merge strategy for PRs | Clean linear history on main | ✓ Good — easy bisect |
+| PersistentPreRunE skip list for update/install-skill | Commands must work without DB on fresh installs | ✓ Good — no false errors on first install |
 
 ---
-*Last updated: 2026-03-06 after initialization*
+*Last updated: 2026-03-07 after v0.3 milestone*
