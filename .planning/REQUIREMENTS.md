@@ -50,7 +50,7 @@ Requirements for v0.3.0 release. Each maps to a roadmap phase.
 - [x] **UPDT-01**: User can check for and install updates with `dtasks update`
 - [x] **UPDT-02**: `dtasks update` shows current version and latest available
 - [x] **UPDT-03**: `dtasks update` downloads and atomically replaces the running binary for the correct OS/arch
-- [x] **UPDT-04**: `dtasks update` respects `--json` flag
+- [ ] **UPDT-04**: `dtasks update` respects `--json` flag
 
 ### Install Completions
 
@@ -116,7 +116,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UPDT-01 | Phase 3 | Complete |
 | UPDT-02 | Phase 3 | Complete |
 | UPDT-03 | Phase 3 | Complete |
-| UPDT-04 | Phase 3 | Complete |
+| UPDT-04 | Phase 3 + Phase 7 (gap closure) | Pending |
 | COMP-01 | Phase 3 | Complete |
 | COMP-02 | Phase 3 | Complete |
 | COMP-03 | Phase 3 | Complete |
@@ -130,6 +130,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 - v1 requirements: 32 total
 - Mapped to phases: 32
 - Unmapped: 0 ✓
+- Pending (gap closure): 1 (UPDT-04)
 
 ---
 *Requirements defined: 2026-03-06*

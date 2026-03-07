@@ -12,6 +12,7 @@ Brownfield project at v0.2.0. This milestone adds task querying (filters, sortin
 - [x] **Phase 4: Release** - Feature branch, CI validation, tag v0.3.0, and publish release assets (completed 2026-03-06)
 - [x] **Phase 5: Polish** - Fix --sort help text discoverability gap (gap closure) (completed 2026-03-06)
 - [x] **Phase 6: Skill Install** - Add skill auto-install to first-install path via install.sh (gap closure) (completed 2026-03-07)
+- [ ] **Phase 7: Fix JSON Update Output** - Fix JSON output contamination and double-flag-read in cmd/update.go (gap closure)
 
 ## Phase Details
 
@@ -107,6 +108,19 @@ Plans:
 Plans:
 - [ ] 06-01-PLAN.md — install-skill Cobra command + root wiring + install.sh integration
 
+### Phase 7: Fix JSON Update Output
+**Goal**: `dtasks --json update` emits valid JSON only — no plain text contamination
+**Depends on**: Phase 6
+**Requirements**: UPDT-04
+**Gap Closure**: Closes `updt-04-json-contamination` integration gap and `json-update-flow` E2E flow gap from v0.3 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. `dtasks --json update` on a successful binary update emits only a valid JSON object to stdout — no preceding plain text
+  2. `cmd/update.go` reads `--json` via `output.JSONMode` (single source of truth), not a second `cmd.Flags().Lookup` call
+**Plans**: 1 plan
+
+Plans:
+- [ ] 07-01-PLAN.md — Gate plain-text hint and PromptAndInstall on !useJSON; use output.JSONMode for flag read
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -117,3 +131,4 @@ Plans:
 | 4. Release | 2/2 | Complete    | 2026-03-06 |
 | 5. Polish | 1/1 | Complete   | 2026-03-06 |
 | 6. Skill Install | 1/1 | Complete   | 2026-03-07 |
+| 7. Fix JSON Update Output | 0/1 | Pending | — |
