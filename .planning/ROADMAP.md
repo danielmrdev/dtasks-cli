@@ -102,7 +102,10 @@ Plans:
   1. After `install.sh` installs the binary, it runs `dtasks install-skill` (or equivalent) to offer skill consent
   2. On a non-TTY install, skill install is skipped gracefully (same non-TTY behavior as update path)
   3. All existing SKIL-01..04 tests still pass; install.sh `bash -n` syntax check passes
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 06-01-PLAN.md — install-skill Cobra command + root wiring + install.sh integration
 
 ## Progress
 
@@ -113,4 +116,4 @@ Plans:
 | 3. Tooling | 5/5 | Complete   | 2026-03-06 |
 | 4. Release | 2/2 | Complete    | 2026-03-06 |
 | 5. Polish | 1/1 | Complete   | 2026-03-06 |
-| 6. Skill Install | 0/? | Not started | - |
+| 6. Skill Install | 0/1 | Not started | - |
